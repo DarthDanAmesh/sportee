@@ -5,334 +5,385 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Match Predictor</title>
 <style>
+  :root {
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --secondary: #64748b;
+    --secondary-hover: #475569;
+    --danger: #dc2626;
+    --danger-hover: #b91c1c;
+    --success: #16a34a;
+    --success-hover: #15803d;
+    
+    --bg: #f8fafc;
+    --card-bg: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    
+    --radius: 8px;
+    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  }
+
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
-    font-family: system-ui, sans-serif;
-    font-size: 14px;
-    background: #f0f2f5;
-    color: #111;
-    padding: 24px 16px;
+    font-family: system-ui, -apple-system, sans-serif;
+    font-size: 15px;
+    background: var(--bg);
+    color: var(--text);
+    padding: 32px 24px;
+    line-height: 1.5;
   }
 
-  h1 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
-  h2 { font-size: 15px; font-weight: 600; margin-bottom: 12px;
-       border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+  h1 { font-size: 28px; font-weight: 700; margin-bottom: 24px; color: #0f172a; }
+  h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1e293b; }
 
   .layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    max-width: 980px;
+    gap: 24px;
+    max-width: 1200px;
   }
-  @media (max-width: 640px) { .layout { grid-template-columns: 1fr; } }
+  @media (max-width: 768px) { 
+    .layout { grid-template-columns: 1fr; }
+    body { padding: 16px 12px; }
+  }
 
   .card {
-    background: #fff;
-    border: 1px solid #ddd;
-    padding: 16px;
-    border-radius: 5px;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    padding: 24px;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
   }
   .card.full { grid-column: 1 / -1; }
 
   label {
     display: block;
-    font-size: 12px;
-    color: #555;
-    margin-bottom: 3px;
-    margin-top: 10px;
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    font-weight: 500;
   }
-  label:first-of-type { margin-top: 0; }
 
   input[type="text"],
   input[type="number"],
-  input[type="date"] {
+  input[type="date"],
+  input[type="file"] {
     width: 100%;
-    padding: 6px 8px;
-    border: 1px solid #ccc;
-    border-radius: 3px;
+    padding: 10px 12px;
+    border: 1px solid var(--border);
+    border-radius: 6px;
     font-size: 14px;
     font-family: inherit;
+    background: #fff;
+    transition: all 0.2s;
   }
-  input:focus { outline: 2px solid #0066cc; border-color: #0066cc; }
+  input:focus { 
+    outline: none; 
+    border-color: var(--primary); 
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
 
-  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
 
-  /* swap row */
+  /* Team swap row */
   .team-swap-row {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    gap: 8px;
+    gap: 12px;
     align-items: end;
+    margin-bottom: 16px;
   }
   .swap-btn {
-    padding: 0 10px;
-    height: 34px;
-    background: #eee;
-    color: #333;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    font-size: 18px;
+    padding: 0 12px;
+    height: 42px;
+    background: #f1f5f9;
+    color: var(--text);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 20px;
     cursor: pointer;
     line-height: 1;
+    transition: all 0.2s;
   }
-  .swap-btn:hover { background: #ddd; }
+  .swap-btn:hover { background: #e2e8f0; transform: rotate(180deg); }
 
   button {
-    margin-top: 12px;
-    padding: 7px 14px;
-    background: #0066cc;
+    margin-top: 16px;
+    padding: 10px 20px;
+    background: var(--primary);
     color: #fff;
     border: none;
-    border-radius: 3px;
+    border-radius: 6px;
     font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     font-family: inherit;
+    transition: background 0.2s;
   }
-  button:hover { background: #0052a3; }
-  button.danger   { background: #cc2200; }
-  button.danger:hover  { background: #a31b00; }
-  button.secondary { background: #555; }
-  button.secondary:hover { background: #333; }
-  button.success  { background: #176717; }
-  button.success:hover { background: #0f4c0f; }
+  button:hover { background: var(--primary-hover); }
+  button:disabled { background: #94a3b8; cursor: not-allowed; }
+  
+  button.danger { background: var(--danger); }
+  button.danger:hover { background: var(--danger-hover); }
+  button.secondary { background: var(--secondary); }
+  button.secondary:hover { background: var(--secondary-hover); }
+  button.success { background: var(--success); }
+  button.success:hover { background: var(--success-hover); }
 
-  .msg { margin-top: 8px; font-size: 12px; }
-  .msg.ok  { color: #176717; }
-  .msg.err { color: #cc2200; }
+  /* Alerts & Messages */
+  .msg { 
+    margin-top: 12px; 
+    font-size: 13px; 
+    padding: 10px 12px;
+    border-radius: 6px;
+    display: none;
+  }
+  .msg.ok  { background: #dcfce7; color: #166534; display: block; }
+  .msg.err { background: #fee2e2; color: #991b1b; display: block; }
 
-  /* tables */
-  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  /* Tables */
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
   th {
     text-align: left;
-    padding: 5px 6px;
-    border-bottom: 2px solid #ddd;
+    padding: 10px 12px;
+    border-bottom: 2px solid var(--border);
     font-weight: 600;
-    color: #555;
+    color: var(--text-muted);
     font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
-  td { padding: 5px 6px; border-bottom: 1px solid #eee; vertical-align: middle; }
+  td { padding: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
-  td button { margin-top: 0; padding: 2px 8px; font-size: 12px; background: #888; }
-  td button:hover { background: #555; }
+  tr:hover td { background: #f8fafc; }
+  td button { margin-top: 0; padding: 4px 10px; font-size: 12px; background: var(--secondary); }
+  td button:hover { background: var(--secondary-hover); }
 
-  #match-list-wrap { max-height: 300px; overflow-y: auto; }
+  #match-list-wrap { max-height: 400px; overflow-y: auto; }
 
-  /* prediction result */
-  #result-box { display: none; margin-top: 14px; }
-  .result-headline { font-size: 17px; font-weight: 700; margin-bottom: 4px; }
-  .result-sub { color: #555; margin-bottom: 14px; font-size: 13px; }
+  /* Prediction result */
+  #result-box { display: none; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
+  .result-headline { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #0f172a; }
+  .result-sub { color: var(--text-muted); margin-bottom: 24px; font-size: 15px; }
 
-  .prob-bar-wrap { margin-bottom: 10px; }
+  .prob-bar-wrap { margin-bottom: 16px; }
   .prob-label {
     display: flex;
     justify-content: space-between;
-    font-size: 12px;
-    margin-bottom: 3px;
+    font-size: 14px;
+    margin-bottom: 6px;
+    font-weight: 500;
   }
-  .prob-bar-bg { background: #eee; border-radius: 2px; height: 8px; }
-  .prob-bar-fill { height: 8px; border-radius: 2px; background: #0066cc; transition: width .3s; }
-  .prob-bar-fill.draw { background: #888; }
-  .prob-bar-fill.away { background: #cc4400; }
+  .prob-bar-bg { background: #f1f5f9; border-radius: 4px; height: 12px; overflow: hidden; }
+  .prob-bar-fill { height: 12px; border-radius: 4px; background: var(--primary); transition: width .4s ease-out; }
+  .prob-bar-fill.draw { background: var(--secondary); }
+  .prob-bar-fill.away { background: #f97316; }
+  .prob-bar-fill.winner { box-shadow: 0 0 0 2px rgba(0,0,0,0.1) inset; }
 
-  .breakdown-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
-  .breakdown-table th {
-    padding: 4px 6px; text-align: right; font-weight: 600;
-    color: #555; border-bottom: 1px solid #ddd;
-  }
+  .breakdown-table { margin-top: 24px; }
+  .breakdown-table th { text-align: right; }
   .breakdown-table th:first-child { text-align: left; }
-  .breakdown-table td { padding: 4px 6px; text-align: right; border-bottom: 1px solid #eee; }
-  .breakdown-table td:first-child { text-align: left; }
+  .breakdown-table td { text-align: right; }
+  .breakdown-table td:first-child { text-align: left; font-weight: 500; }
   .breakdown-table tr.combined-row td {
-    border-top: 1px solid #ddd; font-weight: 700; border-bottom: none;
+    border-top: 2px solid var(--border); 
+    font-weight: 700; 
+    background: #f8fafc;
   }
 
   .confidence-badge {
     display: inline-block;
-    padding: 2px 8px;
-    border-radius: 2px;
-    font-size: 12px;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 13px;
     font-weight: 600;
-    background: #e8f0fb;
-    color: #0044aa;
+    background: #eff6ff;
+    color: var(--primary);
   }
 
-  /* record-result inline form */
+  /* Record result inline form */
   .record-result-form {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 14px;
-    padding-top: 12px;
-    border-top: 1px solid #eee;
+    gap: 12px;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
     flex-wrap: wrap;
   }
-  .record-result-form label {
-    margin: 0;
-    font-size: 12px;
-    color: #555;
-  }
-  .record-result-form input[type="number"] {
-    width: 54px;
-    padding: 4px 6px;
-    font-size: 13px;
-  }
-  .record-result-form button { margin-top: 0; padding: 5px 12px; font-size: 13px; }
-  #record-msg { font-size: 12px; }
+  .record-result-form label { margin: 0; font-size: 13px; }
+  .record-result-form input[type="number"] { width: 60px; padding: 6px 8px; }
+  .record-result-form button { margin-top: 0; }
 
-  /* accordion */
+  /* Accordion */
   .accordion-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
     cursor: pointer;
     user-select: none;
-    padding: 8px 10px;
-    background: #f0f4ff;
-    border: 1px solid #c8d8f0;
-    border-radius: 3px;
-    font-size: 13px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    font-size: 15px;
     font-weight: 600;
-    color: #0044aa;
+    color: var(--text);
+    transition: background 0.2s;
   }
-  .accordion-header .chevron { font-size: 11px; transition: transform .2s; }
+  .accordion-header:hover { background: #f1f5f9; }
+  .accordion-header .chevron { font-size: 12px; transition: transform .2s; }
   .accordion-header.open .chevron { transform: rotate(180deg); }
   .accordion-body {
     display: none;
-    border: 1px solid #c8d8f0;
+    border: 1px solid var(--border);
     border-top: none;
-    border-radius: 0 0 3px 3px;
+    border-radius: 0 0 6px 6px;
   }
   .accordion-body.open { display: block; }
-  #league-table-wrap { max-height: 320px; overflow-y: auto; padding: 4px 0; }
 
-  /* page tabs */
+  /* Page Tabs */
   .page-tabs {
     display: flex;
-    gap: 4px;
-    margin-bottom: 20px;
-    border-bottom: 2px solid #ddd;
-    padding-bottom: 0;
+    gap: 8px;
+    margin-bottom: 32px;
+    border-bottom: 2px solid var(--border);
   }
   .page-tab {
-    padding: 7px 16px;
-    border: 1px solid transparent;
-    border-bottom: none;
+    padding: 10px 20px;
+    border: none;
     background: transparent;
-    border-radius: 3px 3px 0 0;
+    border-radius: 6px 6px 0 0;
     cursor: pointer;
-    font-size: 14px;
+    font-size: 15px;
+    font-weight: 500;
     font-family: inherit;
-    color: #555;
-    margin-bottom: -2px;
+    color: var(--text-muted);
     margin-top: 0;
+    position: relative;
+    top: 2px;
+    border-bottom: 3px solid transparent;
   }
   .page-tab.active {
-    background: #fff;
-    border-color: #ddd;
-    border-bottom-color: #fff;
-    color: #0066cc;
-    font-weight: 600;
+    color: var(--primary);
+    border-bottom-color: var(--primary);
+    background: transparent;
   }
-  .page-tab:hover:not(.active) { background: #f5f5f5; }
+  .page-tab:hover:not(.active) { color: var(--text); background: #f1f5f9; }
 
   .page-panel { display: none; }
   .page-panel.active { display: block; }
 
-  .empty { color: #999; font-size: 13px; padding: 10px 0; }
+  .empty { color: var(--text-muted); font-size: 14px; padding: 24px 0; text-align: center; }
 
-  /* toggle switch */
+  /* Toggle switch */
   .toggle-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-top: 10px;
-    font-size: 13px;
-    color: #555;
+    gap: 12px;
+    margin-top: 16px;
+    margin-bottom: 16px;
+    font-size: 14px;
+    color: var(--text);
+    background: #f8fafc;
+    padding: 12px;
+    border-radius: 6px;
   }
-  .toggle-switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
+  .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
   .toggle-switch input { display: none; }
   .toggle-slider {
     position: absolute; inset: 0;
-    background: #ccc; border-radius: 20px; cursor: pointer; transition: background .2s;
+    background: #cbd5e1; border-radius: 22px; cursor: pointer; transition: 0.3s;
   }
   .toggle-slider::before {
     content: '';
     position: absolute;
-    width: 14px; height: 14px;
+    width: 16px; height: 16px;
     left: 3px; top: 3px;
-    background: #fff; border-radius: 50%; transition: transform .2s;
+    background: #fff; border-radius: 50%; transition: 0.3s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
   }
-  .toggle-switch input:checked + .toggle-slider { background: #0066cc; }
-  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
+  .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
 
-  /* csv row */
+  /* CSV Row */
   .csv-row {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
     flex-wrap: wrap;
-    margin-top: 12px;
-    padding-top: 12px;
-    border-top: 1px solid #eee;
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--border);
   }
-  .csv-row input[type="file"] { font-size: 13px; flex: 1; min-width: 0; }
+  .csv-row input[type="file"] { font-size: 13px; flex: 1; min-width: 200px; border: none; padding: 0; }
   .csv-row button { margin-top: 0; }
-  .csv-hint { font-size: 11px; color: #999; margin-top: 4px; }
+  .csv-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; width: 100%; }
 
-  /* predictions history */
-  #pred-table-wrap { max-height: 400px; overflow-y: auto; }
+  /* Predictions History */
+  #pred-table-wrap { max-height: 600px; overflow-y: auto; }
   .outcome-badge {
     display: inline-block;
-    padding: 1px 7px;
-    border-radius: 2px;
-    font-size: 11px;
-    font-weight: 700;
+    padding: 2px 10px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
   }
-  .outcome-badge.correct  { background: #d4edda; color: #155724; }
-  .outcome-badge.wrong    { background: #f8d7da; color: #721c24; }
-  .outcome-badge.pending  { background: #fff3cd; color: #856404; }
+  .outcome-badge.correct  { background: #dcfce7; color: #166534; }
+  .outcome-badge.wrong    { background: #fee2e2; color: #991b1b; }
+  .outcome-badge.pending  { background: #fef9c3; color: #854d0e; }
 
-  /* evaluation panel */
+  /* Evaluation Panel */
   .eval-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-    gap: 12px;
-    margin-bottom: 16px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: 16px;
+    margin-bottom: 32px;
   }
   .eval-stat {
-    background: #f8f9ff;
-    border: 1px solid #d0d8f0;
-    border-radius: 4px;
-    padding: 12px 14px;
+    background: #f8fafc;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
   }
-  .eval-stat .val { font-size: 26px; font-weight: 700; color: #0044aa; line-height: 1.1; }
-  .eval-stat .lbl { font-size: 11px; color: #777; margin-top: 2px; }
+  .eval-stat .val { font-size: 32px; font-weight: 700; color: var(--primary); line-height: 1.1; margin-bottom: 4px; }
+  .eval-stat .lbl { font-size: 13px; color: var(--text-muted); }
 
-  /* calibration chart */
+  /* Calibration chart */
   .cal-row {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 6px;
-    font-size: 12px;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 13px;
   }
-  .cal-bucket { width: 34px; text-align: right; color: #555; font-weight: 600; flex-shrink: 0; }
-  .cal-bar-wrap { flex: 1; position: relative; height: 14px; background: #eee; border-radius: 2px; }
+  .cal-bucket { width: 40px; text-align: right; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
+  .cal-bar-wrap { flex: 1; position: relative; height: 20px; background: #f1f5f9; border-radius: 4px; }
   .cal-bar-pred {
     position: absolute; top: 0; left: 0; height: 100%;
-    background: #c8d8f0; border-radius: 2px;
+    background: #dbeafe; border-radius: 4px;
   }
   .cal-bar-actual {
-    position: absolute; top: 2px; left: 0; height: 10px;
-    background: #0066cc; border-radius: 2px;
+    position: absolute; top: 4px; left: 0; height: 12px;
+    background: var(--primary); border-radius: 4px;
     transition: width .4s;
   }
-  .cal-meta { width: 90px; text-align: right; color: #555; flex-shrink: 0; }
-  .cal-gap-pos { color: #cc2200; font-weight: 600; }
-  .cal-gap-neg { color: #176717; font-weight: 600; }
-  .cal-n { width: 34px; text-align: right; color: #aaa; flex-shrink: 0; }
+  .cal-meta { width: 120px; text-align: right; color: var(--text); flex-shrink: 0; font-size: 12px; }
+  .cal-gap-pos { color: var(--danger); font-weight: 600; }
+  .cal-gap-neg { color: var(--success); font-weight: 600; }
+  .cal-n { width: 40px; text-align: right; color: #94a3b8; flex-shrink: 0; font-size: 12px; }
+  
+  /* Scrollbar Styling */
+  ::-webkit-scrollbar { width: 8px; height: 8px; }
+  ::-webkit-scrollbar-track { background: #f1f5f9; }
+  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
 </style>
 </head>
 <body>
@@ -341,10 +392,10 @@
 
 <!-- Page-level tabs -->
 <div class="page-tabs">
-  <button class="page-tab active" onclick="showPage('matches')">Matches</button>
-  <button class="page-tab" onclick="showPage('predict')">Predict</button>
-  <button class="page-tab" onclick="showPage('history')">Predictions</button>
-  <button class="page-tab" onclick="showPage('evaluate')">Evaluate</button>
+  <button class="page-tab active" onclick="showPage('matches', this)">Matches</button>
+  <button class="page-tab" onclick="showPage('predict', this)">Predict</button>
+  <button class="page-tab" onclick="showPage('history', this)">Predictions</button>
+  <button class="page-tab" onclick="showPage('evaluate', this)">Evaluate</button>
 </div>
 
 <!-- ════════════════════════════════════════════
@@ -358,32 +409,30 @@
       <h2>Add Historical Match</h2>
 
       <label>Date</label>
-      <input type="date" id="m-date">
+      <input type="date" id="m-date" style="margin-bottom: 16px;">
 
-      <div style="margin-top:10px">
-        <div class="team-swap-row">
-          <div>
-            <label style="margin-top:0">Home Team</label>
-            <input type="text" id="m-home" list="team-suggestions" placeholder="e.g. Lazio" autocomplete="off">
-          </div>
-          <div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding-bottom:1px">
-            <span style="font-size:10px;color:#aaa">swap</span>
-            <button class="swap-btn" onclick="swapMatchTeams()" title="Swap home/away">⇄</button>
-          </div>
-          <div>
-            <label style="margin-top:0">Away Team</label>
-            <input type="text" id="m-away" list="team-suggestions" placeholder="e.g. Napoli" autocomplete="off">
-          </div>
+      <div class="team-swap-row">
+        <div>
+          <label>Home Team</label>
+          <input type="text" id="m-home" list="team-suggestions" placeholder="e.g. Lazio" autocomplete="off">
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:2px">
+          <span style="font-size:11px;color:var(--text-muted)">swap</span>
+          <button class="swap-btn" onclick="swapMatchTeams()" title="Swap home/away">⇄</button>
+        </div>
+        <div>
+          <label>Away Team</label>
+          <input type="text" id="m-away" list="team-suggestions" placeholder="e.g. Napoli" autocomplete="off">
         </div>
       </div>
 
-      <div class="row-2" style="margin-top:10px">
+      <div class="row-2">
         <div>
-          <label style="margin-top:0">Home Score</label>
+          <label>Home Score</label>
           <input type="number" id="m-hs" min="0" value="0">
         </div>
         <div>
-          <label style="margin-top:0">Away Score</label>
+          <label>Away Score</label>
           <input type="number" id="m-as" min="0" value="0">
         </div>
       </div>
@@ -407,12 +456,12 @@
         <span>Also add reverse fixture (swap teams, invert score)</span>
       </div>
 
-      <button onclick="addMatch()">Add Match</button>
+      <button id="btn-add-match" onclick="addMatch()">Add Match</button>
       <div id="add-msg" class="msg"></div>
 
       <div class="csv-row">
         <input type="file" id="csv-file" accept=".csv">
-        <button class="secondary" onclick="uploadCSV()">Upload CSV</button>
+        <button class="secondary" id="btn-upload-csv" onclick="uploadCSV()">Upload CSV</button>
       </div>
       <div class="csv-hint">Columns: date, home_team, away_team, home_score, away_score, home_xg?, away_xg?</div>
       <div id="csv-msg" class="msg"></div>
@@ -420,8 +469,8 @@
 
     <!-- Match list + league table -->
     <div>
-      <div class="card" style="margin-bottom:16px">
-        <h2>Historical Matches <span id="match-count" style="font-weight:400;color:#999;font-size:12px"></span></h2>
+      <div class="card" style="margin-bottom:24px">
+        <h2>Historical Matches <span id="match-count" style="font-weight:400;color:#aaa;font-size:14px"></span></h2>
         <div id="match-list-wrap">
           <div id="match-list-empty" class="empty">No matches added yet.</div>
           <table id="match-table" style="display:none">
@@ -431,22 +480,22 @@
             <tbody id="match-tbody"></tbody>
           </table>
         </div>
-        <button class="danger" style="margin-top:10px" onclick="resetAll()">Clear All Matches</button>
+        <button class="danger" style="margin-top:16px" onclick="resetAll()">Clear All Matches</button>
       </div>
 
       <!-- League table accordion -->
-      <div class="card">
+      <div class="card" style="padding: 16px;">
         <div class="accordion-header open" id="league-hdr" onclick="toggleLeague()">
           <span>League Table</span>
           <span class="chevron">▼</span>
         </div>
         <div class="accordion-body open" id="league-body">
-          <div style="padding:8px 10px;border-bottom:1px solid #e8eef8;display:flex;gap:8px;align-items:center">
-            <button class="secondary" style="margin:0;padding:4px 10px;font-size:12px" onclick="loadTable()">Refresh</button>
-            <span style="font-size:11px;color:#aaa">Click header to collapse</span>
+          <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center">
+            <button class="secondary" style="margin:0;padding:6px 14px;font-size:13px" onclick="loadTable()">Refresh</button>
+            <span style="font-size:12px;color:var(--text-muted)">Click header to collapse</span>
           </div>
-          <div id="league-table-wrap">
-            <div class="empty" style="padding:10px 10px">Add matches and click Refresh.</div>
+          <div id="league-table-wrap" style="max-height: 400px; overflow-y: auto;">
+            <div class="empty">Add matches and click Refresh.</div>
           </div>
         </div>
       </div>
@@ -461,25 +510,25 @@
 ════════════════════════════════════════════ -->
 <div id="page-predict" class="page-panel">
   <div class="layout">
-    <div class="card" style="grid-column:1/-1;max-width:560px">
+    <div class="card" style="grid-column:1/-1;max-width:640px">
       <h2>Predict a Match</h2>
 
       <div class="team-swap-row">
         <div>
-          <label style="margin-top:0">Home Team</label>
+          <label>Home Team</label>
           <input type="text" id="p-home" list="team-suggestions" placeholder="Home team" autocomplete="off">
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:2px;padding-bottom:1px">
-          <span style="font-size:10px;color:#aaa">swap</span>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:2px">
+          <span style="font-size:11px;color:var(--text-muted)">swap</span>
           <button class="swap-btn" onclick="swapPredictTeams()" title="Swap home/away">⇄</button>
         </div>
         <div>
-          <label style="margin-top:0">Away Team</label>
+          <label>Away Team</label>
           <input type="text" id="p-away" list="team-suggestions" placeholder="Away team" autocomplete="off">
         </div>
       </div>
 
-      <p style="font-size:12px;color:#888;margin-top:12px">Odds (decimal) — leave as 0 to skip</p>
+      <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Odds (decimal) — leave as 0 to skip</p>
       <div class="row-3">
         <div>
           <label>Home Win</label>
@@ -495,11 +544,10 @@
         </div>
       </div>
 
-      <button onclick="runPrediction()">Predict</button>
+      <button id="btn-predict" onclick="runPrediction()">Predict Match</button>
       <div id="predict-msg" class="msg"></div>
 
       <div id="result-box">
-        <hr style="margin:14px 0;border:none;border-top:1px solid #eee">
         <div class="result-headline" id="r-headline"></div>
         <div class="result-sub" id="r-sub"></div>
 
@@ -525,14 +573,14 @@
 
         <!-- Record actual result -->
         <div class="record-result-form" id="record-result-form">
-          <span style="font-size:12px;color:#555;font-weight:600">Record result:</span>
+          <span style="font-size:14px;color:var(--text);font-weight:600">Record result:</span>
           <label>Home</label>
           <input type="number" id="rr-home" min="0" value="0">
-          <span style="color:#999">–</span>
+          <span style="color:#aaa">–</span>
           <label>Away</label>
           <input type="number" id="rr-away" min="0" value="0">
-          <button class="success" onclick="recordResult()">Save Result</button>
-          <span id="record-msg" class="msg"></span>
+          <button class="success" id="btn-record" onclick="recordResult()">Save Result</button>
+          <span id="record-msg" class="msg" style="margin-top:0;flex:1"></span>
         </div>
       </div>
     </div>
@@ -544,11 +592,11 @@
      PAGE: PREDICTIONS HISTORY
 ════════════════════════════════════════════ -->
 <div id="page-history" class="page-panel">
-  <div style="max-width:980px">
+  <div style="max-width:1200px">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
         <h2 style="border:none;margin:0;padding:0">Prediction History</h2>
-        <button class="secondary" style="margin:0;padding:4px 12px;font-size:12px" onclick="loadHistory()">Refresh</button>
+        <button class="secondary" style="margin:0;padding:8px 16px;font-size:14px" onclick="loadHistory()">Refresh</button>
       </div>
       <div id="pred-table-wrap">
         <div class="empty">No predictions recorded yet. Run a prediction first.</div>
@@ -562,11 +610,11 @@
      PAGE: EVALUATE
 ════════════════════════════════════════════ -->
 <div id="page-evaluate" class="page-panel">
-  <div style="max-width:700px">
+  <div style="max-width:800px">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
         <h2 style="border:none;margin:0;padding:0">Evaluation</h2>
-        <button onclick="runEvaluate()" style="margin:0;padding:6px 16px">Run Evaluation</button>
+        <button id="btn-evaluate" onclick="runEvaluate()" style="margin:0;padding:8px 16px">Run Evaluation</button>
       </div>
 
       <div id="eval-empty" class="empty">
@@ -576,15 +624,15 @@
       <div id="eval-results" style="display:none">
         <div class="eval-grid" id="eval-stats"></div>
 
-        <h2 style="margin-top:4px">Calibration</h2>
-        <p style="font-size:12px;color:#777;margin-bottom:12px">
+        <h2 style="margin-top:8px">Calibration</h2>
+        <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
           Each row = one confidence bucket.
-          <span style="display:inline-block;width:12px;height:8px;background:#c8d8f0;border-radius:1px;vertical-align:middle"></span> predicted rate &nbsp;
-          <span style="display:inline-block;width:12px;height:8px;background:#0066cc;border-radius:1px;vertical-align:middle"></span> actual rate.
+          <span style="display:inline-block;width:14px;height:10px;background:#dbeafe;border-radius:2px;vertical-align:middle"></span> predicted rate &nbsp;
+          <span style="display:inline-block;width:14px;height:10px;background:var(--primary);border-radius:2px;vertical-align:middle"></span> actual rate.
           Gap: predicted − actual (negative = over-confident).
         </p>
         <div id="eval-calibration"></div>
-        <p style="font-size:11px;color:#aaa;margin-top:10px">
+        <p style="font-size:12px;color:#aaa;margin-top:20px">
           Collect 50+ evaluated predictions before drawing strong conclusions.
         </p>
       </div>
@@ -601,11 +649,28 @@ let _lastPredictionId = null;
 
 // ── utilities ──────────────────────────────────────────────────────────────
 
+// Enhanced message function for better visibility (Heuristic: Visibility of System Status)
 function msg(id, text, ok) {
   const el = document.getElementById(id);
+  if (!el) return;
   el.textContent = text;
   el.className = 'msg ' + (ok ? 'ok' : 'err');
-  if (ok) setTimeout(() => { if (el.textContent === text) el.textContent = ''; }, 3500);
+  el.style.display = text ? 'block' : 'none';
+  if (ok) setTimeout(() => { if (el.textContent === text) { el.textContent=''; el.style.display='none'; } }, 3500);
+}
+
+// Button loading state helper
+function setLoading(btnId, isLoading, originalText) {
+  const btn = document.getElementById(btnId);
+  if (!btn) return;
+  if (isLoading) {
+    btn.dataset.originalText = btn.textContent;
+    btn.textContent = 'Processing...';
+    btn.disabled = true;
+  } else {
+    btn.textContent = originalText || btn.dataset.originalText || 'Submit';
+    btn.disabled = false;
+  }
 }
 
 function esc(s) {
@@ -629,11 +694,13 @@ function fmtDateTime(iso) {
 
 // ── page tabs ──────────────────────────────────────────────────────────────
 
-function showPage(name) {
+// Fixed to accept element directly instead of fragile global event
+function showPage(name, el) {
   document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.page-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
-  event.currentTarget.classList.add('active');
+  if (el) el.classList.add('active');
+  
   // Lazy-load tabs
   if (name === 'history')  loadHistory();
   if (name === 'evaluate') runEvaluate();
@@ -710,6 +777,7 @@ async function addMatch() {
     }).then(r => r.json());
   };
 
+  setLoading('btn-add-match', true);
   try {
     const data = await post(home, away, hs, as_, hxg, axg);
     if (!data.added) { msg('add-msg', 'Match already exists (duplicate).', false); return; }
@@ -723,6 +791,7 @@ async function addMatch() {
     await loadMatches();
     await refreshTeamList();
   } catch (_) { msg('add-msg', 'Network error adding match.', false); }
+  setLoading('btn-add-match', false, 'Add Match');
 }
 
 // ── CSV upload ─────────────────────────────────────────────────────────────
@@ -735,6 +804,7 @@ async function uploadCSV() {
   const fd = new FormData();
   fd.append('file', file);
 
+  setLoading('btn-upload-csv', true);
   try {
     const res  = await fetch(`${API}/upload-csv`, { method: 'POST', body: fd });
     const data = await res.json();
@@ -746,6 +816,7 @@ async function uploadCSV() {
     await loadMatches();
     await refreshTeamList();
   } catch (_) { msg('csv-msg', 'Network error during upload.', false); }
+  setLoading('btn-upload-csv', false, 'Upload CSV');
 }
 
 // ── load matches ───────────────────────────────────────────────────────────
@@ -810,7 +881,7 @@ async function resetAll() {
     await loadMatches();
     await refreshTeamList();
     document.getElementById('league-table-wrap').innerHTML =
-      '<div class="empty" style="padding:10px 10px">Add matches and click Refresh.</div>';
+      '<div class="empty">Add matches and click Refresh.</div>';
     document.getElementById('result-box').style.display = 'none';
     _lastPredictionId = null;
   } catch (_) {}
@@ -830,6 +901,7 @@ async function runPrediction() {
     msg('predict-msg', 'Home and away teams must be different.', false); return;
   }
 
+  setLoading('btn-predict', true);
   try {
     const res  = await fetch(`${API}/predict`, {
       method: 'POST',
@@ -847,7 +919,9 @@ async function runPrediction() {
     document.getElementById('rr-home').value = 0;
     document.getElementById('rr-away').value = 0;
     document.getElementById('record-msg').textContent = '';
+    document.getElementById('record-msg').style.display = 'none';
   } catch (_) { msg('predict-msg', 'Network error.', false); }
+  setLoading('btn-predict', false, 'Predict Match');
 }
 
 function renderResult(d) {
@@ -863,9 +937,22 @@ function renderResult(d) {
   document.getElementById('r-home-pct').textContent = d.probabilities.home + '%';
   document.getElementById('r-draw-pct').textContent = d.probabilities.draw + '%';
   document.getElementById('r-away-pct').textContent = d.probabilities.away + '%';
-  document.getElementById('r-home-bar').style.width = d.probabilities.home + '%';
-  document.getElementById('r-draw-bar').style.width = d.probabilities.draw + '%';
-  document.getElementById('r-away-bar').style.width = d.probabilities.away + '%';
+  
+  const homeBar = document.getElementById('r-home-bar');
+  const drawBar = document.getElementById('r-draw-bar');
+  const awayBar = document.getElementById('r-away-bar');
+  
+  homeBar.style.width = d.probabilities.home + '%';
+  drawBar.style.width = d.probabilities.draw + '%';
+  awayBar.style.width = d.probabilities.away + '%';
+
+  // Highlight winner bar
+  homeBar.classList.remove('winner');
+  drawBar.classList.remove('winner');
+  awayBar.classList.remove('winner');
+  if (d.prediction === 'H') homeBar.classList.add('winner');
+  if (d.prediction === 'D') drawBar.classList.add('winner');
+  if (d.prediction === 'A') awayBar.classList.add('winner');
 
   const tbody = document.getElementById('r-breakdown-body');
   tbody.innerHTML = '';
@@ -893,6 +980,7 @@ async function recordResult() {
     msg('record-msg', 'Enter valid non-negative scores.', false); return;
   }
 
+  setLoading('btn-record', true);
   try {
     const res = await fetch(`${API}/predictions/result`, {
       method: 'POST',
@@ -906,6 +994,7 @@ async function recordResult() {
     msg('record-msg', `Saved: ${data.outcome_label}  ${tick}`, data.is_correct);
     _lastPredictionId = null;  // prevent double-submit
   } catch (_) { msg('record-msg', 'Network error.', false); }
+  setLoading('btn-record', false, 'Save Result');
 }
 
 // ── league table ───────────────────────────────────────────────────────────
@@ -920,18 +1009,18 @@ async function loadTable() {
     const table = await fetch(`${API}/table`).then(r => r.json());
     const wrap  = document.getElementById('league-table-wrap');
     if (!table.length) {
-      wrap.innerHTML = '<div class="empty" style="padding:10px">No data yet.</div>'; return;
+      wrap.innerHTML = '<div class="empty">No data yet.</div>'; return;
     }
-    let html = `<table style="font-size:12px">
+    let html = `<table>
       <thead><tr><th>#</th><th>Team</th><th>P</th><th>Pts</th><th>GD</th><th>GF</th><th>GA</th><th>Form</th></tr></thead>
       <tbody>`;
     table.forEach(r => {
       const form = r.form.split('').map(c => {
-        const color = c==='W'?'#176717':c==='L'?'#cc2200':'#888';
+        const color = c==='W'?'var(--success)':c==='L'?'var(--danger)':'var(--secondary)';
         return `<span style="color:${color};font-weight:700">${c}</span>`;
       }).join(' ');
       html += `<tr>
-        <td>${r.position}</td><td>${esc(r.team)}</td>
+        <td>${r.position}</td><td style="font-weight:600">${esc(r.team)}</td>
         <td>${r.played}</td><td><strong>${r.points}</strong></td>
         <td>${r.gd>=0?'+':''}${r.gd}</td><td>${r.scored}</td><td>${r.conceded}</td>
         <td style="letter-spacing:2px">${form}</td>
@@ -980,9 +1069,9 @@ async function loadHistory() {
         outcomeBadge  = `<span class="outcome-badge ${cls}">${label}</span>`;
       }
       html += `<tr>
-        <td style="color:#aaa;font-size:11px">${r.id}</td>
-        <td style="white-space:nowrap;font-size:11px;color:#777">${fmtDateTime(r.created_at)}</td>
-        <td style="white-space:nowrap">${esc(r.home_team)} vs ${esc(r.away_team)}</td>
+        <td style="color:#aaa;font-size:12px">${r.id}</td>
+        <td style="white-space:nowrap;font-size:12px;color:var(--text-muted)">${fmtDateTime(r.created_at)}</td>
+        <td style="white-space:nowrap;font-weight:500">${esc(r.home_team)} vs ${esc(r.away_team)}</td>
         <td>${pred_label[r.prediction] || r.prediction}</td>
         <td>${r.confidence}%</td>
         <td>${r.prob_home}%</td>
@@ -1000,6 +1089,7 @@ async function loadHistory() {
 // ── evaluate ───────────────────────────────────────────────────────────────
 
 async function runEvaluate() {
+  setLoading('btn-evaluate', true);
   try {
     const data = await fetch(`${API}/evaluate`).then(r => r.json());
     const emptyEl   = document.getElementById('eval-empty');
@@ -1068,6 +1158,7 @@ async function runEvaluate() {
     });
     calEl.innerHTML = calHtml || '<div class="empty">No calibration data yet.</div>';
   } catch (_) {}
+  setLoading('btn-evaluate', false, 'Run Evaluation');
 }
 
 // ── init ───────────────────────────────────────────────────────────────────
