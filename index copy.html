@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Match Predictor</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: system-ui, sans-serif;
+    font-size: 14px;
+    background: #f5f5f5;
+    color: #111;
+    padding: 24px 16px;
+  }
+
+  h1 { font-size: 20px; font-weight: 700; margin-bottom: 24px; }
+  h2 { font-size: 15px; font-weight: 600; margin-bottom: 12px; border-bottom: 1px solid #ddd; padding-bottom: 6px; }
+
+  .layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    max-width: 960px;
+  }
+  @media (max-width: 640px) { .layout { grid-template-columns: 1fr; } }
+
+  .card {
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 16px;
+    border-radius: 4px;
+  }
+  .card.full { grid-column: 1 / -1; }
+
+  label { display: block; font-size: 12px; color: #555; margin-bottom: 3px; margin-top: 10px; }
+  label:first-of-type { margin-top: 0; }
+
+  input[type="text"], input[type="number"], input[type="date"] {
+    width: 100%;
+    padding: 6px 8px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    font-size: 14px;
+    font-family: inherit;
+  }
+  input:focus { outline: 2px solid #0066cc; border-color: #0066cc; }
+
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+
+  button {
+    margin-top: 12px;
+    padding: 7px 14px;
+    background: #0066cc;
+    color: #fff;
+    border: none;
+    border-radius: 3px;
+    font-size: 14px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  button:hover { background: #0052a3; }
+  button.danger { background: #cc2200; }
+  button.danger:hover { background: #a31b00; }
+  button.secondary { background: #555; }
+  button.secondary:hover { background: #333; }
+
+  .msg { margin-top: 8px; font-size: 12px; }
+  .msg.ok  { color: #176717; }
+  .msg.err { color: #cc2200; }
+
+  /* Matches table */
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  th { text-align: left; padding: 5px 6px; border-bottom: 2px solid #ddd; font-weight: 600; color: #555; font-size: 12px; }
+  td { padding: 5px 6px; border-bottom: 1px solid #eee; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  td button { margin-top: 0; padding: 2px 8px; font-size: 12px; background: #888; }
+  td button:hover { background: #555; }
+
+  #match-list-wrap { max-height: 320px; overflow-y: auto; }
+
+  /* Prediction result */
+  #result-box { display: none; margin-top: 14px; }
+  .result-headline {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .result-sub { color: #555; margin-bottom: 14px; font-size: 13px; }
+
+  .prob-bar-wrap { margin-bottom: 10px; }
+  .prob-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 3px; }
+  .prob-bar-bg { background: #eee; border-radius: 2px; height: 8px; }
+  .prob-bar-fill { height: 8px; border-radius: 2px; background: #0066cc; transition: width .3s; }
+  .prob-bar-fill.draw { background: #888; }
+  .prob-bar-fill.away { background: #cc4400; }
+
+  .breakdown-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+  .breakdown-table th { padding: 4px 6px; text-align: right; font-weight: 600; color: #555; border-bottom: 1px solid #ddd; }
+  .breakdown-table th:first-child { text-align: left; }
+  .breakdown-table td { padding: 4px 6px; text-align: right; border-bottom: 1px solid #eee; }
+  .breakdown-table td:first-child { text-align: left; }
+  .breakdown-table tr:last-child td { border-bottom: none; font-weight: 700; }
+
+  .confidence-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 12px;
+    font-weight: 600;
+    background: #e8f0fb;
+    color: #0044aa;
+  }
+
+  /* League table */
+  #league-table-wrap { max-height: 340px; overflow-y: auto; margin-top: 8px; }
+  .collapsible-toggle {
+    cursor: pointer;
+    user-select: none;
+    background: #f0f0f0;
+    border: 1px solid #ddd;
+    padding: 4px 12px;
+    border-radius: 3px;
+    font-size: 13px;
+    margin-bottom: 8px;
+    display: inline-block;
+  }
+  .collapsible-content {
+    display: none;
+  }
+  .collapsible-content.open {
+    display: block;
+  }
+
+  .tab-bar { display: flex; gap: 4px; margin-bottom: 14px; }
+  .tab-btn { padding: 5px 12px; border: 1px solid #ccc; background: #f5f5f5; border-radius: 3px; cursor: pointer; font-size: 13px; font-family: inherit; }
+  .tab-btn.active { background: #0066cc; color: #fff; border-color: #0066cc; }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  .empty { color: #999; font-size: 13px; padding: 12px 0; }
+
+  /* datalist dropdown hint */
+  input[list] { cursor: text; }
+
+  /* CSV upload */
+  .csv-upload { margin-top: 10px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+  .csv-upload input[type="file"] { font-size: 13px; }
+</style>
+</head>
+<body>
+
+<h1>Match Predictor</h1>
+
+<div class="layout">
+
+  <!-- LEFT: Add match + Match list -->
+  <div>
+    <div class="card" style="margin-bottom:16px">
+      <h2>Add Historical Match</h2>
+      <label>Date</label>
+      <input type="date" id="m-date">
+      <div class="row-2">
+        <div>
+          <label>Home Team</label>
+          <input type="text" id="m-home" list="team-suggestions" placeholder="e.g. Lazio" autocomplete="off">
+        </div>
+        <div>
+          <label>Away Team</label>
+          <input type="text" id="m-away" list="team-suggestions" placeholder="e.g. Napoli" autocomplete="off">
+        </div>
+      </div>
+      <div class="row-2">
+        <div>
+          <label>Home Score</label>
+          <input type="number" id="m-hs" min="0" value="0">
+        </div>
+        <div>
+          <label>Away Score</label>
+          <input type="number" id="m-as" min="0" value="0">
+        </div>
+      </div>
+      <div class="row-2">
+        <div>
+          <label>Home xG <span style="color:#aaa">(optional)</span></label>
+          <input type="number" id="m-hxg" step="0.01" min="0" placeholder="—">
+        </div>
+        <div>
+          <label>Away xG <span style="color:#aaa">(optional)</span></label>
+          <input type="number" id="m-axg" step="0.01" min="0" placeholder="—">
+        </div>
+      </div>
+      <div style="margin-top:10px; display: flex; align-items: center; gap: 16px; flex-wrap: wrap;">
+        <label style="display:flex; align-items:center; gap:6px; margin:0; font-size:13px;">
+          <input type="checkbox" id="reverse-fixture"> Also add reverse fixture
+        </label>
+        <button onclick="addMatch()">Add Match</button>
+      </div>
+      <div id="add-msg" class="msg"></div>
+
+      <!-- CSV upload -->
+      <div class="csv-upload">
+        <input type="file" id="csv-file" accept=".csv">
+        <button onclick="uploadCSV()" class="secondary" style="margin-top:0;">Upload CSV</button>
+        <span style="font-size:12px; color:#888;">(date,home_team,away_team,home_score,away_score,home_xg?,away_xg?)</span>
+      </div>
+      <div id="csv-msg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>Historical Matches <span id="match-count" style="font-weight:400;color:#999;font-size:12px"></span></h2>
+      <div id="match-list-wrap">
+        <div id="match-list-empty" class="empty">No matches added yet.</div>
+        <table id="match-table" style="display:none">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Home</th>
+              <th>Score</th>
+              <th>Away</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="match-tbody"></tbody>
+        </table>
+      </div>
+      <button class="danger" style="margin-top:10px" onclick="resetAll()">Clear All Matches</button>
+    </div>
+  </div>
+
+  <!-- RIGHT: Predict + League table -->
+  <div>
+    <div class="card" style="margin-bottom:16px">
+      <h2>Predict a Match</h2>
+      <div class="row-2">
+        <div>
+          <label>Home Team</label>
+          <input type="text" id="p-home" list="team-suggestions" placeholder="Home team" autocomplete="off">
+        </div>
+        <div>
+          <label>Away Team</label>
+          <input type="text" id="p-away" list="team-suggestions" placeholder="Away team" autocomplete="off">
+        </div>
+      </div>
+      <p style="font-size:12px;color:#888;margin-top:10px;margin-bottom:0">Odds (decimal) — leave as 0 to skip</p>
+      <div class="row-3">
+        <div>
+          <label>Home Win</label>
+          <input type="number" id="p-oh" step="0.01" min="0" value="0">
+        </div>
+        <div>
+          <label>Draw</label>
+          <input type="number" id="p-od" step="0.01" min="0" value="0">
+        </div>
+        <div>
+          <label>Away Win</label>
+          <input type="number" id="p-oa" step="0.01" min="0" value="0">
+        </div>
+      </div>
+      <button onclick="runPrediction()">Predict</button>
+
+      <div id="result-box">
+        <hr style="margin:14px 0;border:none;border-top:1px solid #eee">
+        <div class="result-headline" id="r-headline"></div>
+        <div class="result-sub" id="r-sub"></div>
+
+        <div class="prob-bar-wrap">
+          <div class="prob-label"><span id="r-home-label">Home</span><span id="r-home-pct"></span></div>
+          <div class="prob-bar-bg"><div class="prob-bar-fill" id="r-home-bar"></div></div>
+        </div>
+        <div class="prob-bar-wrap">
+          <div class="prob-label"><span>Draw</span><span id="r-draw-pct"></span></div>
+          <div class="prob-bar-bg"><div class="prob-bar-fill draw" id="r-draw-bar"></div></div>
+        </div>
+        <div class="prob-bar-wrap">
+          <div class="prob-label"><span id="r-away-label">Away</span><span id="r-away-pct"></span></div>
+          <div class="prob-bar-bg"><div class="prob-bar-fill away" id="r-away-bar"></div></div>
+        </div>
+
+        <table class="breakdown-table" id="r-breakdown">
+          <thead>
+            <tr><th>Source</th><th>Home</th><th>Draw</th><th>Away</th></tr>
+          </thead>
+          <tbody id="r-breakdown-body"></tbody>
+        </table>
+      </div>
+
+      <div id="predict-msg" class="msg"></div>
+    </div>
+
+    <div class="card">
+      <div class="tab-bar">
+        <button class="tab-btn active" onclick="switchTab('table')">League Table</button>
+      </div>
+      <div id="tab-table" class="tab-panel active">
+        <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+          <button class="secondary" style="margin-top:0;margin-bottom:10px" onclick="loadTable()">Refresh Table</button>
+          <span class="collapsible-toggle" onclick="toggleLeagueTable()">Toggle Table</span>
+        </div>
+        <div id="league-table-wrap" class="collapsible-content open">
+          <div class="empty">Add matches and click Refresh Table.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Shared datalist for team name autocomplete -->
+<datalist id="team-suggestions"></datalist>
+
+<script>
+const API = '';  // same origin
+
+// ── utility ──
+function msg(id, text, ok) {
+  const el = document.getElementById(id);
+  el.textContent = text;
+  el.className = 'msg ' + (ok ? 'ok' : 'err');
+  if (ok) setTimeout(() => { el.textContent = ''; }, 3000);
+}
+
+function fmtDate(iso) {
+  // "2024-08-20" → "20 Aug 2024"
+  const [y, m, d] = iso.split('-');
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  return `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
+}
+
+// ── team autocomplete ──
+async function refreshTeamList() {
+  const teams = await fetch(`${API}/teams`).then(r => r.json()).catch(() => []);
+  const dl = document.getElementById('team-suggestions');
+  dl.innerHTML = '';
+  teams.forEach(t => {
+    const opt = document.createElement('option');
+    opt.value = t;
+    dl.appendChild(opt);
+  });
+}
+
+// ── add match ──
+async function addMatch() {
+  const d    = document.getElementById('m-date').value;
+  const home = document.getElementById('m-home').value.trim();
+  const away = document.getElementById('m-away').value.trim();
+  const hs   = parseInt(document.getElementById('m-hs').value) || 0;
+  const as_  = parseInt(document.getElementById('m-as').value) || 0;
+  const hxg  = document.getElementById('m-hxg').value;
+  const axg  = document.getElementById('m-axg').value;
+  const reverse = document.getElementById('reverse-fixture').checked;
+
+  if (!d || !home || !away) {
+    msg('add-msg', 'Date, home team, and away team are required.', false);
+    return;
+  }
+  if (home === away) {
+    msg('add-msg', 'Home and away teams must be different.', false);
+    return;
+  }
+
+  const body = { date: d, home_team: home, away_team: away, home_score: hs, away_score: as_ };
+  if (hxg !== '') body.home_xg = parseFloat(hxg);
+  if (axg !== '') body.away_xg = parseFloat(axg);
+
+  const addOne = async (h, a, hscore, ascore) => {
+    const b = { ...body, home_team: h, away_team: a, home_score: hscore, away_score: ascore };
+    const res = await fetch(`${API}/matches`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(b),
+    });
+    return res.json();
+  };
+
+  try {
+    const data = await addOne(home, away, hs, as_);
+    if (!data.added) {
+      msg('add-msg', 'Match already exists (duplicate).', false);
+      return;
+    }
+    if (reverse) {
+      // add reverse fixture (swap home/away)
+      const revData = await addOne(away, home, as_, hs);
+      // if revData.added false, it's a duplicate – that's fine.
+    }
+    msg('add-msg', `Added. Total: ${data.total} matches.`, true);
+    document.getElementById('m-hs').value = 0;
+    document.getElementById('m-as').value = 0;
+    document.getElementById('m-hxg').value = '';
+    document.getElementById('m-axg').value = '';
+    await loadMatches();
+    await refreshTeamList();
+  } catch (e) {
+    msg('add-msg', 'Error adding match.', false);
+  }
+}
+
+// ── CSV upload ──
+async function uploadCSV() {
+  const fileInput = document.getElementById('csv-file');
+  const file = fileInput.files[0];
+  if (!file) {
+    msg('csv-msg', 'Please select a CSV file.', false);
+    return;
+  }
+  const formData = new FormData();
+  formData.append('file', file);
+
+  const res = await fetch(`${API}/upload-csv`, {
+    method: 'POST',
+    body: formData,
+  });
+  const data = await res.json();
+  if (!res.ok) {
+    msg('csv-msg', data.detail || 'Upload failed.', false);
+    return;
+  }
+  msg('csv-msg', `Uploaded: ${data.added} matches added. Total: ${data.total}`, true);
+  fileInput.value = '';
+  await loadMatches();
+  await refreshTeamList();
+}
+
+// ── load matches list ──
+async function loadMatches() {
+  const matches = await fetch(`${API}/matches`).then(r => r.json()).catch(() => []);
+  const tbody = document.getElementById('match-tbody');
+  const table = document.getElementById('match-table');
+  const empty = document.getElementById('match-list-empty');
+  const count = document.getElementById('match-count');
+
+  tbody.innerHTML = '';
+  if (matches.length === 0) {
+    table.style.display = 'none';
+    empty.style.display = 'block';
+    count.textContent = '';
+    return;
+  }
+  table.style.display = 'table';
+  empty.style.display = 'none';
+  count.textContent = `(${matches.length})`;
+
+  matches.forEach(m => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td>${fmtDate(m.date)}</td>
+      <td>${esc(m.home_team)}</td>
+      <td style="font-variant-numeric:tabular-nums;font-weight:600">${m.home_score} – ${m.away_score}</td>
+      <td>${esc(m.away_team)}</td>
+      <td><button onclick="deleteMatch('${m.date}','${esc(m.home_team)}','${esc(m.away_team)}')">✕</button></td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function esc(s) {
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+
+// ── delete match ──
+async function deleteMatch(date, home, away) {
+  const res = await fetch(`${API}/matches`, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ date, home_team: home, away_team: away }),
+  });
+  if (!res.ok) { alert('Could not delete match.'); return; }
+  await loadMatches();
+  await refreshTeamList();
+}
+
+// ── reset ──
+async function resetAll() {
+  if (!confirm('Clear all match data?')) return;
+  await fetch(`${API}/reset`, { method: 'DELETE' });
+  await loadMatches();
+  await refreshTeamList();
+  document.getElementById('league-table-wrap').innerHTML = '<div class="empty">Add matches and click Refresh Table.</div>';
+  document.getElementById('result-box').style.display = 'none';
+}
+
+// ── predict ──
+async function runPrediction() {
+  const home = document.getElementById('p-home').value.trim();
+  const away = document.getElementById('p-away').value.trim();
+  const oh   = parseFloat(document.getElementById('p-oh').value) || 0;
+  const od   = parseFloat(document.getElementById('p-od').value) || 0;
+  const oa   = parseFloat(document.getElementById('p-oa').value) || 0;
+
+  if (!home || !away) {
+    msg('predict-msg', 'Enter both team names.', false);
+    return;
+  }
+  if (home === away) {
+    msg('predict-msg', 'Home and away teams must be different.', false);
+    return;
+  }
+
+  const res = await fetch(`${API}/predict`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ home_team: home, away_team: away, odds_h: oh, odds_d: od, odds_a: oa }),
+  });
+  const data = await res.json();
+  if (!res.ok) { msg('predict-msg', data.detail || 'Prediction failed.', false); return; }
+
+  msg('predict-msg', '', true);
+  renderResult(data);
+}
+
+function renderResult(d) {
+  const box = document.getElementById('result-box');
+  box.style.display = 'block';
+
+  document.getElementById('r-headline').textContent = `${d.home_team}  ${d.probabilities.home}%  –  ${d.probabilities.away}%  ${d.away_team}`;
+  document.getElementById('r-sub').innerHTML =
+    `Prediction: <strong>${d.prediction}</strong> &nbsp;·&nbsp; Confidence: <span class="confidence-badge">${d.confidence}%</span>`;
+
+  document.getElementById('r-home-label').textContent = d.home_team;
+  document.getElementById('r-away-label').textContent = d.away_team;
+
+  document.getElementById('r-home-pct').textContent = d.probabilities.home + '%';
+  document.getElementById('r-draw-pct').textContent = d.probabilities.draw + '%';
+  document.getElementById('r-away-pct').textContent = d.probabilities.away + '%';
+
+  document.getElementById('r-home-bar').style.width = d.probabilities.home + '%';
+  document.getElementById('r-draw-bar').style.width = d.probabilities.draw + '%';
+  document.getElementById('r-away-bar').style.width = d.probabilities.away + '%';
+
+  const tbody = document.getElementById('r-breakdown-body');
+  tbody.innerHTML = '';
+  const srcLabels = { odds: 'Odds', performance: 'Performance', historical: 'H2H' };
+  for (const [src, p] of Object.entries(d.breakdown)) {
+    const label = srcLabels[src] || src;
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${label}</td><td>${p.home}%</td><td>${p.draw}%</td><td>${p.away}%</td>`;
+    tbody.appendChild(tr);
+  }
+  // combined row
+  const cr = document.createElement('tr');
+  const cp = d.probabilities;
+  cr.innerHTML = `<td>Combined</td><td>${cp.home}%</td><td>${cp.draw}%</td><td>${cp.away}%</td>`;
+  tbody.appendChild(cr);
+}
+
+// ── league table ──
+async function loadTable() {
+  const table = await fetch(`${API}/table`).then(r => r.json()).catch(() => []);
+  const wrap = document.getElementById('league-table-wrap');
+  if (!table.length) {
+    wrap.innerHTML = '<div class="empty">No data yet.</div>';
+    return;
+  }
+  let html = `<table>
+    <thead><tr>
+      <th>#</th><th>Team</th><th>P</th><th>Pts</th><th>GD</th><th>GF</th><th>GA</th><th>Form</th>
+    </tr></thead><tbody>`;
+  table.forEach(row => {
+    const formHtml = row.form.split('').map(c => {
+      const color = c === 'W' ? '#176717' : c === 'L' ? '#cc2200' : '#888';
+      return `<span style="color:${color};font-weight:700">${c}</span>`;
+    }).join(' ');
+    html += `<tr>
+      <td>${row.position}</td>
+      <td>${esc(row.team)}</td>
+      <td>${row.played}</td>
+      <td><strong>${row.points}</strong></td>
+      <td>${row.gd >= 0 ? '+' : ''}${row.gd}</td>
+      <td>${row.scored}</td>
+      <td>${row.conceded}</td>
+      <td style="letter-spacing:2px">${formHtml}</td>
+    </tr>`;
+  });
+  html += '</tbody></table>';
+  wrap.innerHTML = html;
+}
+
+// ── collapsible league table ──
+function toggleLeagueTable() {
+  const wrap = document.getElementById('league-table-wrap');
+  wrap.classList.toggle('open');
+}
+
+function switchTab(name) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.currentTarget.classList.add('active');
+}
+
+// ── init ──
+loadMatches();
+refreshTeamList();
+</script>
+</body>
+</html>
