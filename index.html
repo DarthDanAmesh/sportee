@@ -6,219 +6,297 @@
 <title>Match Predictor</title>
 <style>
   :root {
-    --primary: #2563eb;
-    --primary-hover: #1d4ed8;
-    --secondary: #64748b;
-    --secondary-hover: #475569;
-    --danger: #dc2626;
-    --danger-hover: #b91c1c;
-    --success: #16a34a;
-    --success-hover: #15803d;
-    
-    --bg: #f8fafc;
+    --primary: #185FA5;
+    --primary-light: #E6F1FB;
+    --primary-mid: #378ADD;
+    --secondary: #5F5E5A;
+    --secondary-light: #F1EFE8;
+    --danger: #A32D2D;
+    --danger-light: #FCEBEB;
+    --success: #3B6D11;
+    --success-light: #EAF3DE;
+    --warning: #854F0B;
+    --warning-light: #FAEEDA;
+    --pending: #533AB7;
+    --pending-light: #EEEDFE;
+
+    --bg: #F6F5F0;
     --card-bg: #ffffff;
-    --text: #1e293b;
-    --text-muted: #64748b;
-    --border: #e2e8f0;
-    
+    --text: #2C2C2A;
+    --text-muted: #5F5E5A;
+    --border: #D3D1C7;
+    --border-light: #E8E7E2;
+
     --radius: 8px;
-    --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --radius-lg: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   }
 
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
   body {
     font-family: system-ui, -apple-system, sans-serif;
-    font-size: 15px;
+    font-size: 14px;
     background: var(--bg);
     color: var(--text);
     padding: 32px 24px;
     line-height: 1.5;
   }
 
-  h1 { font-size: 28px; font-weight: 700; margin-bottom: 24px; color: #0f172a; }
-  h2 { font-size: 18px; font-weight: 600; margin-bottom: 16px; color: #1e293b; }
+  .app-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    margin-bottom: 28px;
+  }
+  .app-header h1 { font-size: 22px; font-weight: 500; color: var(--text); }
+  .app-header .subtitle { font-size: 13px; color: var(--text-muted); }
+
+  h2 { font-size: 15px; font-weight: 500; margin-bottom: 16px; color: var(--text); }
+  h3 { font-size: 13px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
 
   .layout {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 24px;
-    max-width: 1200px;
+    gap: 20px;
+    max-width: 1100px;
   }
-  @media (max-width: 768px) { 
+  @media (max-width: 768px) {
     .layout { grid-template-columns: 1fr; }
     body { padding: 16px 12px; }
   }
 
   .card {
     background: var(--card-bg);
-    border: 1px solid var(--border);
-    padding: 24px;
-    border-radius: var(--radius);
+    border: 0.5px solid var(--border);
+    padding: 20px;
+    border-radius: var(--radius-lg);
     box-shadow: var(--shadow);
   }
   .card.full { grid-column: 1 / -1; }
 
   label {
     display: block;
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-muted);
-    margin-bottom: 6px;
+    margin-bottom: 5px;
     font-weight: 500;
   }
 
   input[type="text"],
   input[type="number"],
   input[type="date"],
-  input[type="file"] {
+  input[type="file"],
+  select {
     width: 100%;
-    padding: 10px 12px;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 14px;
+    padding: 8px 10px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
     font-family: inherit;
     background: #fff;
-    transition: all 0.2s;
+    color: var(--text);
+    transition: border-color 0.15s, box-shadow 0.15s;
   }
-  input:focus { 
-    outline: none; 
-    border-color: var(--primary); 
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  input:focus, select:focus {
+    outline: none;
+    border-color: var(--primary-mid);
+    box-shadow: 0 0 0 3px rgba(55,138,221,0.12);
   }
 
-  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+  .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
 
-  /* Team swap row */
+  .field { margin-bottom: 12px; }
+
   .team-swap-row {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
-    gap: 12px;
+    gap: 10px;
     align-items: end;
-    margin-bottom: 16px;
+    margin-bottom: 12px;
   }
   .swap-btn {
-    padding: 0 12px;
-    height: 42px;
-    background: #f1f5f9;
+    padding: 0 10px;
+    height: 36px;
+    background: var(--secondary-light);
     color: var(--text);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 20px;
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 16px;
     cursor: pointer;
-    line-height: 1;
-    transition: all 0.2s;
+    transition: background 0.15s, transform 0.2s;
   }
-  .swap-btn:hover { background: #e2e8f0; transform: rotate(180deg); }
+  .swap-btn:hover { background: var(--border); transform: rotate(180deg); }
 
   button {
-    margin-top: 16px;
-    padding: 10px 20px;
+    padding: 8px 16px;
     background: var(--primary);
     color: #fff;
     border: none;
-    border-radius: 6px;
-    font-size: 14px;
+    border-radius: var(--radius);
+    font-size: 13px;
     font-weight: 500;
     cursor: pointer;
     font-family: inherit;
-    transition: background 0.2s;
+    transition: background 0.15s, opacity 0.15s;
   }
-  button:hover { background: var(--primary-hover); }
-  button:disabled { background: #94a3b8; cursor: not-allowed; }
-  
+  button:hover { background: #0C447C; }
+  button:disabled { opacity: 0.5; cursor: not-allowed; }
   button.danger { background: var(--danger); }
-  button.danger:hover { background: var(--danger-hover); }
-  button.secondary { background: var(--secondary); }
-  button.secondary:hover { background: var(--secondary-hover); }
+  button.danger:hover { background: #791F1F; }
+  button.secondary { background: transparent; color: var(--text-muted); border: 0.5px solid var(--border); }
+  button.secondary:hover { background: var(--secondary-light); }
   button.success { background: var(--success); }
-  button.success:hover { background: var(--success-hover); }
+  button.success:hover { background: #27500A; }
+  button.ghost { background: transparent; color: var(--primary); border: 0.5px solid var(--primary-light); padding: 5px 12px; font-size: 12px; }
+  button.ghost:hover { background: var(--primary-light); }
 
-  /* Alerts & Messages */
-  .msg { 
-    margin-top: 12px; 
-    font-size: 13px; 
-    padding: 10px 12px;
-    border-radius: 6px;
+  .msg {
+    margin-top: 10px;
+    font-size: 12px;
+    padding: 8px 10px;
+    border-radius: var(--radius);
     display: none;
   }
-  .msg.ok  { background: #dcfce7; color: #166534; display: block; }
-  .msg.err { background: #fee2e2; color: #991b1b; display: block; }
+  .msg.ok  { background: var(--success-light); color: #27500A; display: block; }
+  .msg.err { background: var(--danger-light); color: #791F1F; display: block; }
 
   /* Tables */
-  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
   th {
     text-align: left;
-    padding: 10px 12px;
-    border-bottom: 2px solid var(--border);
-    font-weight: 600;
+    padding: 8px 10px;
+    border-bottom: 0.5px solid var(--border);
+    font-weight: 500;
     color: var(--text-muted);
-    font-size: 12px;
+    font-size: 11px;
     text-transform: uppercase;
     letter-spacing: 0.05em;
+    background: var(--bg);
   }
-  td { padding: 12px; border-bottom: 1px solid #f1f5f9; vertical-align: middle; }
+  td { padding: 10px; border-bottom: 0.5px solid var(--border-light); vertical-align: middle; }
   tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #f8fafc; }
-  td button { margin-top: 0; padding: 4px 10px; font-size: 12px; background: var(--secondary); }
-  td button:hover { background: var(--secondary-hover); }
+  tr:hover td { background: #FAFAF8; }
+  td button { padding: 3px 8px; font-size: 11px; }
+  #match-list-wrap, #pred-table-wrap { max-height: 420px; overflow-y: auto; }
 
-  #match-list-wrap { max-height: 400px; overflow-y: auto; }
+  /* Page Tabs */
+  .page-tabs {
+    display: flex;
+    gap: 2px;
+    margin-bottom: 24px;
+    border-bottom: 0.5px solid var(--border);
+  }
+  .page-tab {
+    padding: 9px 18px;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 500;
+    font-family: inherit;
+    color: var(--text-muted);
+    position: relative;
+    top: 0.5px;
+    border-bottom: 2px solid transparent;
+    border-radius: var(--radius) var(--radius) 0 0;
+    transition: color 0.15s;
+  }
+  .page-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
+  .page-tab:hover:not(.active) { color: var(--text); background: var(--secondary-light); }
 
-  /* Prediction result */
-  #result-box { display: none; margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); }
-  .result-headline { font-size: 20px; font-weight: 700; margin-bottom: 8px; color: #0f172a; }
-  .result-sub { color: var(--text-muted); margin-bottom: 24px; font-size: 15px; }
+  /* Badge on tab */
+  .tab-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 5px;
+    border-radius: 9px;
+    font-size: 10px;
+    font-weight: 600;
+    background: var(--pending);
+    color: #fff;
+    margin-left: 6px;
+    vertical-align: middle;
+  }
+  .tab-badge:empty { display: none; }
 
-  .prob-bar-wrap { margin-bottom: 16px; }
+  .page-panel { display: none; }
+  .page-panel.active { display: block; }
+  .empty { color: var(--text-muted); font-size: 13px; padding: 24px 0; text-align: center; }
+
+  /* Outcome badges */
+  .badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 11px;
+    font-weight: 600;
+    white-space: nowrap;
+  }
+  .badge.pending  { background: var(--pending-light); color: var(--pending); }
+  .badge.correct  { background: var(--success-light); color: var(--success); }
+  .badge.wrong    { background: var(--danger-light); color: var(--danger); }
+
+  /* Prob bars */
+  .prob-bar-wrap { margin-bottom: 12px; }
   .prob-label {
     display: flex;
     justify-content: space-between;
-    font-size: 14px;
-    margin-bottom: 6px;
+    font-size: 12px;
+    margin-bottom: 4px;
     font-weight: 500;
+    color: var(--text);
   }
-  .prob-bar-bg { background: #f1f5f9; border-radius: 4px; height: 12px; overflow: hidden; }
-  .prob-bar-fill { height: 12px; border-radius: 4px; background: var(--primary); transition: width .4s ease-out; }
+  .prob-bar-bg { background: var(--border-light); border-radius: 3px; height: 8px; overflow: hidden; }
+  .prob-bar-fill { height: 8px; border-radius: 3px; transition: width .35s ease-out; }
+  .prob-bar-fill.home { background: var(--primary-mid); }
   .prob-bar-fill.draw { background: var(--secondary); }
-  .prob-bar-fill.away { background: #f97316; }
-  .prob-bar-fill.winner { box-shadow: 0 0 0 2px rgba(0,0,0,0.1) inset; }
+  .prob-bar-fill.away { background: #D85A30; }
+  .prob-bar-fill.winner { box-shadow: inset 0 0 0 1.5px rgba(0,0,0,0.15); }
 
-  .breakdown-table { margin-top: 24px; }
-  .breakdown-table th { text-align: right; }
+  /* Result box */
+  #result-box { display: none; margin-top: 20px; padding-top: 20px; border-top: 0.5px solid var(--border-light); }
+  .result-headline { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
+  .result-sub { color: var(--text-muted); margin-bottom: 18px; font-size: 13px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+  .confidence-badge { background: var(--primary-light); color: var(--primary); padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
+
+  .breakdown-table th { text-align: right; background: transparent; }
   .breakdown-table th:first-child { text-align: left; }
   .breakdown-table td { text-align: right; }
   .breakdown-table td:first-child { text-align: left; font-weight: 500; }
-  .breakdown-table tr.combined-row td {
-    border-top: 2px solid var(--border); 
-    font-weight: 700; 
-    background: #f8fafc;
-  }
+  .breakdown-table tr.combined-row td { border-top: 0.5px solid var(--border); font-weight: 600; background: #FAFAF8; }
 
-  .confidence-badge {
-    display: inline-block;
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 13px;
-    font-weight: 600;
-    background: #eff6ff;
-    color: var(--primary);
+  /* Queue section in history tab */
+  .pending-section {
+    margin-bottom: 24px;
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    border: 0.5px solid var(--border);
   }
-
-  /* Record result inline form */
-  .record-result-form {
+  .pending-header {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: var(--pending-light);
+    border-bottom: 0.5px solid var(--border);
+  }
+  .pending-header h3 { margin: 0; color: var(--pending); text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 600; }
+
+  /* Inline result entry row */
+  .result-entry-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
     flex-wrap: wrap;
   }
-  .record-result-form label { margin: 0; font-size: 13px; }
-  .record-result-form input[type="number"] { width: 60px; padding: 6px 8px; }
-  .record-result-form button { margin-top: 0; }
+  .result-entry-row input[type="number"] { width: 52px; padding: 5px 8px; font-size: 13px; }
+  .result-entry-row .vs { color: var(--text-muted); font-size: 11px; }
+  .result-entry-row button { margin: 0; padding: 5px 12px; font-size: 12px; }
 
   /* Accordion */
   .accordion-header {
@@ -227,223 +305,156 @@
     justify-content: space-between;
     cursor: pointer;
     user-select: none;
-    padding: 12px 16px;
-    background: #f8fafc;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    font-size: 15px;
-    font-weight: 600;
+    padding: 10px 14px;
+    background: var(--secondary-light);
+    border: 0.5px solid var(--border);
+    border-radius: var(--radius);
+    font-size: 13px;
+    font-weight: 500;
     color: var(--text);
-    transition: background 0.2s;
+    transition: background 0.15s;
   }
-  .accordion-header:hover { background: #f1f5f9; }
-  .accordion-header .chevron { font-size: 12px; transition: transform .2s; }
+  .accordion-header:hover { background: var(--border-light); }
+  .accordion-header .chevron { font-size: 11px; transition: transform .2s; }
   .accordion-header.open .chevron { transform: rotate(180deg); }
-  .accordion-body {
-    display: none;
-    border: 1px solid var(--border);
-    border-top: none;
-    border-radius: 0 0 6px 6px;
-  }
+  .accordion-body { display: none; border: 0.5px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
   .accordion-body.open { display: block; }
 
-  /* Page Tabs */
-  .page-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 32px;
-    border-bottom: 2px solid var(--border);
-  }
-  .page-tab {
-    padding: 10px 20px;
-    border: none;
-    background: transparent;
-    border-radius: 6px 6px 0 0;
-    cursor: pointer;
-    font-size: 15px;
-    font-weight: 500;
-    font-family: inherit;
-    color: var(--text-muted);
-    margin-top: 0;
-    position: relative;
-    top: 2px;
-    border-bottom: 3px solid transparent;
-  }
-  .page-tab.active {
-    color: var(--primary);
-    border-bottom-color: var(--primary);
-    background: transparent;
-  }
-  .page-tab:hover:not(.active) { color: var(--text); background: #f1f5f9; }
-
-  .page-panel { display: none; }
-  .page-panel.active { display: block; }
-
-  .empty { color: var(--text-muted); font-size: 14px; padding: 24px 0; text-align: center; }
-
-  /* Toggle switch */
+  /* Toggle */
   .toggle-row {
     display: flex;
     align-items: center;
-    gap: 12px;
-    margin-top: 16px;
-    margin-bottom: 16px;
-    font-size: 14px;
-    color: var(--text);
-    background: #f8fafc;
-    padding: 12px;
-    border-radius: 6px;
+    gap: 10px;
+    margin: 12px 0;
+    font-size: 13px;
+    color: var(--text-muted);
+    background: var(--secondary-light);
+    padding: 10px;
+    border-radius: var(--radius);
   }
-  .toggle-switch { position: relative; display: inline-block; width: 40px; height: 22px; flex-shrink: 0; }
+  .toggle-switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
   .toggle-switch input { display: none; }
-  .toggle-slider {
-    position: absolute; inset: 0;
-    background: #cbd5e1; border-radius: 22px; cursor: pointer; transition: 0.3s;
-  }
-  .toggle-slider::before {
-    content: '';
-    position: absolute;
-    width: 16px; height: 16px;
-    left: 3px; top: 3px;
-    background: #fff; border-radius: 50%; transition: 0.3s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-  }
-  .toggle-switch input:checked + .toggle-slider { background: var(--primary); }
-  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(18px); }
+  .toggle-slider { position: absolute; inset: 0; background: #B4B2A9; border-radius: 20px; cursor: pointer; transition: 0.25s; }
+  .toggle-slider::before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.25s; }
+  .toggle-switch input:checked + .toggle-slider { background: var(--primary-mid); }
+  .toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
 
   /* CSV Row */
   .csv-row {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     flex-wrap: wrap;
-    margin-top: 24px;
-    padding-top: 24px;
-    border-top: 1px solid var(--border);
+    margin-top: 20px;
+    padding-top: 20px;
+    border-top: 0.5px solid var(--border-light);
   }
-  .csv-row input[type="file"] { font-size: 13px; flex: 1; min-width: 200px; border: none; padding: 0; }
-  .csv-row button { margin-top: 0; }
-  .csv-hint { font-size: 12px; color: var(--text-muted); margin-top: 8px; width: 100%; }
+  .csv-row input[type="file"] { font-size: 12px; flex: 1; min-width: 180px; border: none; padding: 0; }
+  .csv-row button { flex-shrink: 0; }
+  .csv-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; width: 100%; }
 
-  /* Predictions History */
-  #pred-table-wrap { max-height: 600px; overflow-y: auto; }
-  .outcome-badge {
-    display: inline-block;
-    padding: 2px 10px;
-    border-radius: 12px;
-    font-size: 12px;
-    font-weight: 600;
-  }
-  .outcome-badge.correct  { background: #dcfce7; color: #166534; }
-  .outcome-badge.wrong    { background: #fee2e2; color: #991b1b; }
-  .outcome-badge.pending  { background: #fef9c3; color: #854d0e; }
+  /* Eval */
+  .eval-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
+  .eval-stat { background: var(--secondary-light); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; text-align: center; }
+  .eval-stat .val { font-size: 28px; font-weight: 500; color: var(--primary); line-height: 1.1; margin-bottom: 3px; }
+  .eval-stat .lbl { font-size: 11px; color: var(--text-muted); }
 
-  /* Evaluation Panel */
-  .eval-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-    gap: 16px;
-    margin-bottom: 32px;
-  }
-  .eval-stat {
-    background: #f8fafc;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 20px;
-    text-align: center;
-  }
-  .eval-stat .val { font-size: 32px; font-weight: 700; color: var(--primary); line-height: 1.1; margin-bottom: 4px; }
-  .eval-stat .lbl { font-size: 13px; color: var(--text-muted); }
-
-  /* Calibration chart */
-  .cal-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-    font-size: 13px;
-  }
-  .cal-bucket { width: 40px; text-align: right; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
-  .cal-bar-wrap { flex: 1; position: relative; height: 20px; background: #f1f5f9; border-radius: 4px; }
-  .cal-bar-pred {
-    position: absolute; top: 0; left: 0; height: 100%;
-    background: #dbeafe; border-radius: 4px;
-  }
-  .cal-bar-actual {
-    position: absolute; top: 4px; left: 0; height: 12px;
-    background: var(--primary); border-radius: 4px;
-    transition: width .4s;
-  }
-  .cal-meta { width: 120px; text-align: right; color: var(--text); flex-shrink: 0; font-size: 12px; }
+  .cal-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12px; }
+  .cal-bucket { width: 36px; text-align: right; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
+  .cal-bar-wrap { flex: 1; position: relative; height: 18px; background: var(--border-light); border-radius: 3px; }
+  .cal-bar-pred { position: absolute; top: 0; left: 0; height: 100%; background: var(--primary-light); border-radius: 3px; }
+  .cal-bar-actual { position: absolute; top: 3px; left: 0; height: 12px; background: var(--primary-mid); border-radius: 3px; transition: width .35s; }
+  .cal-meta { width: 110px; text-align: right; color: var(--text); flex-shrink: 0; font-size: 11px; }
   .cal-gap-pos { color: var(--danger); font-weight: 600; }
   .cal-gap-neg { color: var(--success); font-weight: 600; }
-  .cal-n { width: 40px; text-align: right; color: #94a3b8; flex-shrink: 0; font-size: 12px; }
-  
-  /* Scrollbar Styling */
-  ::-webkit-scrollbar { width: 8px; height: 8px; }
-  ::-webkit-scrollbar-track { background: #f1f5f9; }
-  ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+  .cal-n { width: 36px; text-align: right; color: #B4B2A9; flex-shrink: 0; font-size: 11px; }
+
+  /* Actions toolbar in history */
+  .history-toolbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .history-toolbar h2 { margin: 0; }
+
+  /* Inline score save feedback */
+  .save-ok { color: var(--success); font-size: 11px; font-weight: 600; }
+  .save-err { color: var(--danger); font-size: 11px; font-weight: 600; }
+
+  /* League table */
+  #league-table-wrap { max-height: 360px; overflow-y: auto; }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--border-light); }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #B4B2A9; }
 </style>
 </head>
 <body>
 
-<h1>Match Predictor</h1>
+<div class="app-header">
+  <h1>Match Predictor</h1>
+  <span class="subtitle">Bayesian multi-match engine</span>
+</div>
 
-<!-- Page-level tabs -->
 <div class="page-tabs">
   <button class="page-tab active" onclick="showPage('matches', this)">Matches</button>
   <button class="page-tab" onclick="showPage('predict', this)">Predict</button>
-  <button class="page-tab" onclick="showPage('history', this)">Predictions</button>
+  <button class="page-tab" id="tab-history" onclick="showPage('history', this)">Fixtures &amp; Results <span class="tab-badge" id="pending-badge"></span></button>
   <button class="page-tab" onclick="showPage('evaluate', this)">Evaluate</button>
 </div>
 
-<!-- ════════════════════════════════════════════
+
+<!-- ══════════════════════════════════════════
      PAGE: MATCHES
-════════════════════════════════════════════ -->
+══════════════════════════════════════════ -->
 <div id="page-matches" class="page-panel active">
   <div class="layout">
 
-    <!-- Add match -->
     <div class="card">
-      <h2>Add Historical Match</h2>
+      <h2>Add historical match</h2>
 
-      <label>Date</label>
-      <input type="date" id="m-date" style="margin-bottom: 16px;">
+      <div class="field">
+        <label>Date</label>
+        <input type="date" id="m-date">
+      </div>
 
       <div class="team-swap-row">
         <div>
-          <label>Home Team</label>
+          <label>Home team</label>
           <input type="text" id="m-home" list="team-suggestions" placeholder="e.g. Lazio" autocomplete="off">
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:2px">
-          <span style="font-size:11px;color:var(--text-muted)">swap</span>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding-bottom:1px">
+          <span style="font-size:10px;color:var(--text-muted)">swap</span>
           <button class="swap-btn" onclick="swapMatchTeams()" title="Swap home/away">⇄</button>
         </div>
         <div>
-          <label>Away Team</label>
+          <label>Away team</label>
           <input type="text" id="m-away" list="team-suggestions" placeholder="e.g. Napoli" autocomplete="off">
         </div>
       </div>
 
       <div class="row-2">
         <div>
-          <label>Home Score</label>
+          <label>Home score</label>
           <input type="number" id="m-hs" min="0" value="0">
         </div>
         <div>
-          <label>Away Score</label>
+          <label>Away score</label>
           <input type="number" id="m-as" min="0" value="0">
         </div>
       </div>
 
       <div class="row-2">
         <div>
-          <label>Home xG <span style="color:#aaa">(optional)</span></label>
+          <label>Home xG <span style="color:#B4B2A9">(optional)</span></label>
           <input type="number" id="m-hxg" step="0.01" min="0" placeholder="—">
         </div>
         <div>
-          <label>Away xG <span style="color:#aaa">(optional)</span></label>
+          <label>Away xG <span style="color:#B4B2A9">(optional)</span></label>
           <input type="number" id="m-axg" step="0.01" min="0" placeholder="—">
         </div>
       </div>
@@ -456,7 +467,10 @@
         <span>Also add reverse fixture (swap teams, invert score)</span>
       </div>
 
-      <button id="btn-add-match" onclick="addMatch()">Add Match</button>
+      <div style="display:flex;gap:8px;margin-top:4px">
+        <button id="btn-add-match" onclick="addMatch()">Add match</button>
+        <button class="danger" onclick="resetAll()">Clear all</button>
+      </div>
       <div id="add-msg" class="msg"></div>
 
       <div class="csv-row">
@@ -467,36 +481,30 @@
       <div id="csv-msg" class="msg"></div>
     </div>
 
-    <!-- Match list + league table -->
     <div>
-      <div class="card" style="margin-bottom:24px">
-        <h2>Historical Matches <span id="match-count" style="font-weight:400;color:#aaa;font-size:14px"></span></h2>
+      <div class="card" style="margin-bottom:16px">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+          <h2 style="margin:0">Historical matches <span id="match-count" style="font-weight:400;color:#B4B2A9;font-size:12px"></span></h2>
+        </div>
         <div id="match-list-wrap">
           <div id="match-list-empty" class="empty">No matches added yet.</div>
           <table id="match-table" style="display:none">
-            <thead>
-              <tr><th>Date</th><th>Home</th><th>Score</th><th>Away</th><th></th></tr>
-            </thead>
+            <thead><tr><th>Date</th><th>Home</th><th>Score</th><th>Away</th><th></th></tr></thead>
             <tbody id="match-tbody"></tbody>
           </table>
         </div>
-        <button class="danger" style="margin-top:16px" onclick="resetAll()">Clear All Matches</button>
       </div>
 
-      <!-- League table accordion -->
-      <div class="card" style="padding: 16px;">
+      <div class="card" style="padding:14px">
         <div class="accordion-header open" id="league-hdr" onclick="toggleLeague()">
-          <span>League Table</span>
+          <span>League table</span>
           <span class="chevron">▼</span>
         </div>
         <div class="accordion-body open" id="league-body">
-          <div style="padding:12px 16px;border-bottom:1px solid var(--border);display:flex;gap:12px;align-items:center">
-            <button class="secondary" style="margin:0;padding:6px 14px;font-size:13px" onclick="loadTable()">Refresh</button>
-            <span style="font-size:12px;color:var(--text-muted)">Click header to collapse</span>
+          <div style="padding:10px 14px;border-bottom:0.5px solid var(--border-light);display:flex;gap:10px;align-items:center">
+            <button class="secondary" style="margin:0;padding:5px 12px;font-size:12px" onclick="loadTable()">Refresh</button>
           </div>
-          <div id="league-table-wrap" style="max-height: 400px; overflow-y: auto;">
-            <div class="empty">Add matches and click Refresh.</div>
-          </div>
+          <div id="league-table-wrap"><div class="empty">Add matches and click Refresh.</div></div>
         </div>
       </div>
     </div>
@@ -505,55 +513,63 @@
 </div>
 
 
-<!-- ════════════════════════════════════════════
+<!-- ══════════════════════════════════════════
      PAGE: PREDICT
-════════════════════════════════════════════ -->
+══════════════════════════════════════════ -->
 <div id="page-predict" class="page-panel">
   <div class="layout">
-    <div class="card" style="grid-column:1/-1;max-width:640px">
-      <h2>Predict a Match</h2>
+
+    <!-- Left: prediction form -->
+    <div class="card">
+      <h2>Predict a match</h2>
 
       <div class="team-swap-row">
         <div>
-          <label>Home Team</label>
+          <label>Home team</label>
           <input type="text" id="p-home" list="team-suggestions" placeholder="Home team" autocomplete="off">
         </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:4px;padding-bottom:2px">
-          <span style="font-size:11px;color:var(--text-muted)">swap</span>
-          <button class="swap-btn" onclick="swapPredictTeams()" title="Swap home/away">⇄</button>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding-bottom:1px">
+          <span style="font-size:10px;color:var(--text-muted)">swap</span>
+          <button class="swap-btn" onclick="swapPredictTeams()">⇄</button>
         </div>
         <div>
-          <label>Away Team</label>
+          <label>Away team</label>
           <input type="text" id="p-away" list="team-suggestions" placeholder="Away team" autocomplete="off">
         </div>
       </div>
 
-      <p style="font-size:13px;color:var(--text-muted);margin-bottom:12px">Odds (decimal) — leave as 0 to skip</p>
-      <div class="row-3">
-        <div>
-          <label>Home Win</label>
-          <input type="number" id="p-oh" step="0.01" min="0" value="0">
-        </div>
-        <div>
-          <label>Draw</label>
-          <input type="number" id="p-od" step="0.01" min="0" value="0">
-        </div>
-        <div>
-          <label>Away Win</label>
-          <input type="number" id="p-oa" step="0.01" min="0" value="0">
+      <div class="field">
+        <label style="margin-bottom:8px">Decimal odds <span style="font-weight:400;color:#B4B2A9">(leave 0 to skip)</span></label>
+        <div class="row-3">
+          <div>
+            <label>Home win</label>
+            <input type="number" id="p-oh" step="0.01" min="0" value="0">
+          </div>
+          <div>
+            <label>Draw</label>
+            <input type="number" id="p-od" step="0.01" min="0" value="0">
+          </div>
+          <div>
+            <label>Away win</label>
+            <input type="number" id="p-oa" step="0.01" min="0" value="0">
+          </div>
         </div>
       </div>
 
-      <button id="btn-predict" onclick="runPrediction()">Predict Match</button>
+      <button id="btn-predict" onclick="runPrediction()">Run prediction</button>
       <div id="predict-msg" class="msg"></div>
 
       <div id="result-box">
         <div class="result-headline" id="r-headline"></div>
-        <div class="result-sub" id="r-sub"></div>
+        <div class="result-sub">
+          <span id="r-prediction-label"></span>
+          <span class="confidence-badge" id="r-confidence"></span>
+          <span id="r-queued-note" style="font-size:11px;color:var(--pending);font-weight:600;display:none">↗ Added to fixtures queue</span>
+        </div>
 
         <div class="prob-bar-wrap">
           <div class="prob-label"><span id="r-home-label">Home</span><span id="r-home-pct"></span></div>
-          <div class="prob-bar-bg"><div class="prob-bar-fill" id="r-home-bar"></div></div>
+          <div class="prob-bar-bg"><div class="prob-bar-fill home" id="r-home-bar"></div></div>
         </div>
         <div class="prob-bar-wrap">
           <div class="prob-label"><span>Draw</span><span id="r-draw-pct"></span></div>
@@ -564,40 +580,64 @@
           <div class="prob-bar-bg"><div class="prob-bar-fill away" id="r-away-bar"></div></div>
         </div>
 
-        <table class="breakdown-table">
-          <thead>
-            <tr><th>Source</th><th>Home</th><th>Draw</th><th>Away</th></tr>
-          </thead>
+        <table class="breakdown-table" style="margin-top:16px">
+          <thead><tr><th>Source</th><th>Home</th><th>Draw</th><th>Away</th></tr></thead>
           <tbody id="r-breakdown-body"></tbody>
         </table>
-
-        <!-- Record actual result -->
-        <div class="record-result-form" id="record-result-form">
-          <span style="font-size:14px;color:var(--text);font-weight:600">Record result:</span>
-          <label>Home</label>
-          <input type="number" id="rr-home" min="0" value="0">
-          <span style="color:#aaa">–</span>
-          <label>Away</label>
-          <input type="number" id="rr-away" min="0" value="0">
-          <button class="success" id="btn-record" onclick="recordResult()">Save Result</button>
-          <span id="record-msg" class="msg" style="margin-top:0;flex:1"></span>
-        </div>
       </div>
     </div>
+
+    <!-- Right: batch fixture builder -->
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <h2 style="margin:0">Fixture queue <span id="queue-count" style="font-weight:400;color:#B4B2A9;font-size:12px"></span></h2>
+        <button class="ghost" onclick="showPage('history', document.getElementById('tab-history'))">View all →</button>
+      </div>
+      <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Run predictions for each fixture. Results can be entered later from the Fixtures &amp; Results tab.</p>
+
+      <div id="queue-empty" class="empty" style="padding:16px 0">No predictions run yet this session.</div>
+
+      <div id="queue-list" style="display:none">
+        <table>
+          <thead><tr><th>Match</th><th>Prediction</th><th>Conf.</th><th></th></tr></thead>
+          <tbody id="queue-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+
   </div>
 </div>
 
 
-<!-- ════════════════════════════════════════════
-     PAGE: PREDICTIONS HISTORY
-════════════════════════════════════════════ -->
+<!-- ══════════════════════════════════════════
+     PAGE: FIXTURES & RESULTS (HISTORY)
+══════════════════════════════════════════ -->
 <div id="page-history" class="page-panel">
-  <div style="max-width:1200px">
+  <div style="max-width:1100px">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-        <h2 style="border:none;margin:0;padding:0">Prediction History</h2>
-        <button class="secondary" style="margin:0;padding:8px 16px;font-size:14px" onclick="loadHistory()">Refresh</button>
+      <div class="history-toolbar">
+        <h2>Fixtures &amp; results</h2>
+        <div style="display:flex;gap:8px;align-items:center">
+          <label style="margin:0;font-size:12px;color:var(--text-muted)">Show:</label>
+          <select id="history-filter" onchange="loadHistory()" style="width:auto;padding:5px 10px;font-size:12px">
+            <option value="all">All</option>
+            <option value="pending">Pending only</option>
+            <option value="evaluated">Evaluated only</option>
+          </select>
+          <button class="secondary" style="padding:5px 12px;font-size:12px" onclick="loadHistory()">Refresh</button>
+        </div>
       </div>
+
+      <!-- Pending batch entry section -->
+      <div id="pending-section" style="display:none" class="pending-section">
+        <div class="pending-header">
+          <h3 id="pending-count-label">Awaiting results</h3>
+          <span style="font-size:11px;color:var(--pending)">Enter the actual scores below</span>
+        </div>
+        <div id="pending-rows"></div>
+      </div>
+
+      <!-- Full history table -->
       <div id="pred-table-wrap">
         <div class="empty">No predictions recorded yet. Run a prediction first.</div>
       </div>
@@ -606,103 +646,88 @@
 </div>
 
 
-<!-- ════════════════════════════════════════════
+<!-- ══════════════════════════════════════════
      PAGE: EVALUATE
-════════════════════════════════════════════ -->
+══════════════════════════════════════════ -->
 <div id="page-evaluate" class="page-panel">
-  <div style="max-width:800px">
+  <div style="max-width:760px">
     <div class="card">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px">
-        <h2 style="border:none;margin:0;padding:0">Evaluation</h2>
-        <button id="btn-evaluate" onclick="runEvaluate()" style="margin:0;padding:8px 16px">Run Evaluation</button>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
+        <h2 style="margin:0">Model evaluation</h2>
+        <button id="btn-evaluate" onclick="runEvaluate()" style="padding:6px 14px;font-size:12px">Run evaluation</button>
       </div>
-
-      <div id="eval-empty" class="empty">
-        Record actual results on predictions first, then click Run Evaluation.
-      </div>
-
+      <div id="eval-empty" class="empty">Record actual results on predictions first, then click Run Evaluation.</div>
       <div id="eval-results" style="display:none">
         <div class="eval-grid" id="eval-stats"></div>
-
-        <h2 style="margin-top:8px">Calibration</h2>
-        <p style="font-size:13px;color:var(--text-muted);margin-bottom:20px">
+        <h2 style="margin-top:4px;margin-bottom:6px">Calibration</h2>
+        <p style="font-size:12px;color:var(--text-muted);margin-bottom:16px">
           Each row = one confidence bucket.
-          <span style="display:inline-block;width:14px;height:10px;background:#dbeafe;border-radius:2px;vertical-align:middle"></span> predicted rate &nbsp;
-          <span style="display:inline-block;width:14px;height:10px;background:var(--primary);border-radius:2px;vertical-align:middle"></span> actual rate.
-          Gap: predicted − actual (negative = over-confident).
+          <span style="display:inline-block;width:12px;height:8px;background:var(--primary-light);border-radius:2px;vertical-align:middle"></span> predicted &nbsp;
+          <span style="display:inline-block;width:12px;height:8px;background:var(--primary-mid);border-radius:2px;vertical-align:middle"></span> actual.
+          Gap: predicted − actual.
         </p>
         <div id="eval-calibration"></div>
-        <p style="font-size:12px;color:#aaa;margin-top:20px">
-          Collect 50+ evaluated predictions before drawing strong conclusions.
-        </p>
+        <p style="font-size:11px;color:#B4B2A9;margin-top:16px">Collect 50+ evaluated predictions before drawing strong conclusions.</p>
       </div>
     </div>
   </div>
 </div>
 
-<!-- Shared datalist -->
 <datalist id="team-suggestions"></datalist>
 
 <script>
 const API = '';
 let _lastPredictionId = null;
+let _queuedPredictions = [];  // [{id, home, away, prediction, confidence}]
 
 // ── utilities ──────────────────────────────────────────────────────────────
 
-// Enhanced message function for better visibility (Heuristic: Visibility of System Status)
 function msg(id, text, ok) {
   const el = document.getElementById(id);
   if (!el) return;
   el.textContent = text;
   el.className = 'msg ' + (ok ? 'ok' : 'err');
   el.style.display = text ? 'block' : 'none';
-  if (ok) setTimeout(() => { if (el.textContent === text) { el.textContent=''; el.style.display='none'; } }, 3500);
+  if (ok && text) setTimeout(() => { if (el.textContent === text) { el.textContent = ''; el.style.display = 'none'; } }, 3500);
 }
 
-// Button loading state helper
-function setLoading(btnId, isLoading, originalText) {
+function setLoading(btnId, loading) {
   const btn = document.getElementById(btnId);
   if (!btn) return;
-  if (isLoading) {
-    btn.dataset.originalText = btn.textContent;
-    btn.textContent = 'Processing...';
-    btn.disabled = true;
-  } else {
-    btn.textContent = originalText || btn.dataset.originalText || 'Submit';
-    btn.disabled = false;
-  }
+  if (loading) { btn.dataset.orig = btn.textContent; btn.textContent = 'Working…'; btn.disabled = true; }
+  else { btn.textContent = btn.dataset.orig || 'Submit'; btn.disabled = false; }
 }
 
 function esc(s) {
-  return String(s)
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
 function fmtDate(iso) {
   if (!iso) return '';
   const [y, m, d] = iso.split('T')[0].split('-');
-  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-  return `${parseInt(d)} ${months[parseInt(m)-1]} ${y}`;
+  return `${parseInt(d)} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]} ${y}`;
 }
-
 function fmtDateTime(iso) {
   if (!iso) return '';
-  const [datePart, timePart = ''] = iso.split('T');
-  return fmtDate(datePart) + (timePart ? ' ' + timePart.slice(0,5) : '');
+  const [datePart, tp = ''] = iso.split('T');
+  return fmtDate(datePart) + (tp ? ' ' + tp.slice(0,5) : '');
+}
+
+function updatePendingBadge(count) {
+  const b = document.getElementById('pending-badge');
+  b.textContent = count > 0 ? count : '';
+  const qc = document.getElementById('queue-count');
+  if (qc) qc.textContent = _queuedPredictions.length > 0 ? `(${_queuedPredictions.length})` : '';
 }
 
 // ── page tabs ──────────────────────────────────────────────────────────────
 
-// Fixed to accept element directly instead of fragile global event
 function showPage(name, el) {
   document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.page-tab').forEach(b => b.classList.remove('active'));
   document.getElementById('page-' + name).classList.add('active');
   if (el) el.classList.add('active');
-  
-  // Lazy-load tabs
-  if (name === 'history')  loadHistory();
+  if (name === 'history') loadHistory();
   if (name === 'evaluate') runEvaluate();
 }
 
@@ -713,36 +738,23 @@ async function refreshTeamList() {
     const teams = await fetch(`${API}/teams`).then(r => r.json());
     const dl = document.getElementById('team-suggestions');
     dl.innerHTML = '';
-    teams.forEach(t => {
-      const opt = document.createElement('option');
-      opt.value = t;
-      dl.appendChild(opt);
-    });
-  } catch (_) {}
+    teams.forEach(t => { const o = document.createElement('option'); o.value = t; dl.appendChild(o); });
+  } catch(_) {}
 }
 
-// ── swap buttons ───────────────────────────────────────────────────────────
+// ── swap ──────────────────────────────────────────────────────────────────
 
 function swapMatchTeams() {
-  const h = document.getElementById('m-home');
-  const a = document.getElementById('m-away');
-  const hs = document.getElementById('m-hs');
-  const as_ = document.getElementById('m-as');
-  const hxg = document.getElementById('m-hxg');
-  const axg = document.getElementById('m-axg');
-  [h.value, a.value]   = [a.value, h.value];
+  const [h, a, hs, as_, hxg, axg] = ['m-home','m-away','m-hs','m-as','m-hxg','m-axg'].map(id => document.getElementById(id));
+  [h.value, a.value] = [a.value, h.value];
   [hs.value, as_.value] = [as_.value, hs.value];
   [hxg.value, axg.value] = [axg.value, hxg.value];
 }
 
 function swapPredictTeams() {
-  const h  = document.getElementById('p-home');
-  const a  = document.getElementById('p-away');
-  const oh = document.getElementById('p-oh');
-  const oa = document.getElementById('p-oa');
-  [h.value, a.value]   = [a.value, h.value];
+  const [h, a, oh, oa] = ['p-home','p-away','p-oh','p-oa'].map(id => document.getElementById(id));
+  [h.value, a.value] = [a.value, h.value];
   [oh.value, oa.value] = [oa.value, oh.value];
-  // Clear any displayed result when teams change
   document.getElementById('result-box').style.display = 'none';
   _lastPredictionId = null;
 }
@@ -750,31 +762,23 @@ function swapPredictTeams() {
 // ── add match ──────────────────────────────────────────────────────────────
 
 async function addMatch() {
-  const d    = document.getElementById('m-date').value;
+  const d = document.getElementById('m-date').value;
   const home = document.getElementById('m-home').value.trim();
   const away = document.getElementById('m-away').value.trim();
-  const hs   = parseInt(document.getElementById('m-hs').value) || 0;
-  const as_  = parseInt(document.getElementById('m-as').value) || 0;
-  const hxg  = document.getElementById('m-hxg').value;
-  const axg  = document.getElementById('m-axg').value;
+  const hs = parseInt(document.getElementById('m-hs').value) || 0;
+  const as_ = parseInt(document.getElementById('m-as').value) || 0;
+  const hxg = document.getElementById('m-hxg').value;
+  const axg = document.getElementById('m-axg').value;
   const doRev = document.getElementById('reverse-fixture').checked;
 
-  if (!d || !home || !away) {
-    msg('add-msg', 'Date, home team, and away team are required.', false); return;
-  }
-  if (home.toLowerCase() === away.toLowerCase()) {
-    msg('add-msg', 'Home and away teams must be different.', false); return;
-  }
+  if (!d || !home || !away) { msg('add-msg', 'Date, home team, and away team are required.', false); return; }
+  if (home.toLowerCase() === away.toLowerCase()) { msg('add-msg', 'Home and away teams must be different.', false); return; }
 
   const post = async (h, a, hscore, ascore, hx, ax) => {
     const body = { date: d, home_team: h, away_team: a, home_score: hscore, away_score: ascore };
     if (hx !== '') body.home_xg = parseFloat(hx);
     if (ax !== '') body.away_xg = parseFloat(ax);
-    return fetch(`${API}/matches`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(body),
-    }).then(r => r.json());
+    return fetch(`${API}/matches`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) }).then(r => r.json());
   };
 
   setLoading('btn-add-match', true);
@@ -782,16 +786,12 @@ async function addMatch() {
     const data = await post(home, away, hs, as_, hxg, axg);
     if (!data.added) { msg('add-msg', 'Match already exists (duplicate).', false); return; }
     if (doRev) await post(away, home, as_, hs, axg, hxg);
-
     msg('add-msg', `Added. Total: ${data.total} match${data.total !== 1 ? 'es' : ''}.`, true);
-    document.getElementById('m-hs').value  = 0;
-    document.getElementById('m-as').value  = 0;
-    document.getElementById('m-hxg').value = '';
-    document.getElementById('m-axg').value = '';
+    ['m-hs','m-as','m-hxg','m-axg'].forEach(id => document.getElementById(id).value = id.includes('xg') ? '' : 0);
     await loadMatches();
     await refreshTeamList();
-  } catch (_) { msg('add-msg', 'Network error adding match.', false); }
-  setLoading('btn-add-match', false, 'Add Match');
+  } catch(_) { msg('add-msg', 'Network error.', false); }
+  setLoading('btn-add-match', false);
 }
 
 // ── CSV upload ─────────────────────────────────────────────────────────────
@@ -800,23 +800,19 @@ async function uploadCSV() {
   const fi = document.getElementById('csv-file');
   const file = fi.files[0];
   if (!file) { msg('csv-msg', 'Please select a CSV file.', false); return; }
-
-  const fd = new FormData();
-  fd.append('file', file);
-
+  const fd = new FormData(); fd.append('file', file);
   setLoading('btn-upload-csv', true);
   try {
-    const res  = await fetch(`${API}/upload-csv`, { method: 'POST', body: fd });
+    const res = await fetch(`${API}/upload-csv`, { method: 'POST', body: fd });
     const data = await res.json();
     if (!res.ok) { msg('csv-msg', data.detail || 'Upload failed.', false); return; }
     let text = `Uploaded: ${data.added} new match${data.added !== 1 ? 'es' : ''}. Total: ${data.total}.`;
     if (data.errors?.length) text += ` Warnings: ${data.errors.join('; ')}`;
     msg('csv-msg', text, true);
     fi.value = '';
-    await loadMatches();
-    await refreshTeamList();
-  } catch (_) { msg('csv-msg', 'Network error during upload.', false); }
-  setLoading('btn-upload-csv', false, 'Upload CSV');
+    await loadMatches(); await refreshTeamList();
+  } catch(_) { msg('csv-msg', 'Network error.', false); }
+  setLoading('btn-upload-csv', false);
 }
 
 // ── load matches ───────────────────────────────────────────────────────────
@@ -828,32 +824,19 @@ async function loadMatches() {
     const table = document.getElementById('match-table');
     const empty = document.getElementById('match-list-empty');
     const count = document.getElementById('match-count');
-
     tbody.innerHTML = '';
-    if (!matches.length) {
-      table.style.display = 'none';
-      empty.style.display = 'block';
-      count.textContent = '';
-      return;
-    }
-    table.style.display = 'table';
-    empty.style.display = 'none';
+    if (!matches.length) { table.style.display = 'none'; empty.style.display = 'block'; count.textContent = ''; return; }
+    table.style.display = 'table'; empty.style.display = 'none';
     count.textContent = `(${matches.length})`;
-
     matches.forEach(m => {
       const tr = document.createElement('tr');
-      tr.innerHTML = `
-        <td>${fmtDate(m.match_date)}</td>
-        <td>${esc(m.home_team)}</td>
+      tr.innerHTML = `<td>${fmtDate(m.match_date)}</td><td>${esc(m.home_team)}</td>
         <td style="font-variant-numeric:tabular-nums;font-weight:600">${m.home_score} – ${m.away_score}</td>
         <td>${esc(m.away_team)}</td>
-        <td>
-          <button onclick="deleteMatch('${esc(m.match_date)}','${esc(m.home_team)}','${esc(m.away_team)}')" title="Delete">✕</button>
-        </td>
-      `;
+        <td><button class="secondary" onclick="deleteMatch('${esc(m.match_date)}','${esc(m.home_team)}','${esc(m.away_team)}')" title="Delete">✕</button></td>`;
       tbody.appendChild(tr);
     });
-  } catch (_) {}
+  } catch(_) {}
 }
 
 // ── delete match ───────────────────────────────────────────────────────────
@@ -861,15 +844,10 @@ async function loadMatches() {
 async function deleteMatch(date, home, away) {
   if (!confirm(`Delete: ${home} vs ${away} (${date})?`)) return;
   try {
-    const res = await fetch(`${API}/matches`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ date, home_team: home, away_team: away }),
-    });
+    const res = await fetch(`${API}/matches`, { method: 'DELETE', headers: {'Content-Type':'application/json'}, body: JSON.stringify({date, home_team: home, away_team: away}) });
     if (!res.ok) { const d = await res.json(); alert(d.detail || 'Could not delete.'); return; }
-    await loadMatches();
-    await refreshTeamList();
-  } catch (_) { alert('Network error.'); }
+    await loadMatches(); await refreshTeamList();
+  } catch(_) { alert('Network error.'); }
 }
 
 // ── reset ──────────────────────────────────────────────────────────────────
@@ -878,13 +856,11 @@ async function resetAll() {
   if (!confirm('Clear ALL match data? This cannot be undone.')) return;
   try {
     await fetch(`${API}/reset`, { method: 'DELETE' });
-    await loadMatches();
-    await refreshTeamList();
-    document.getElementById('league-table-wrap').innerHTML =
-      '<div class="empty">Add matches and click Refresh.</div>';
+    await loadMatches(); await refreshTeamList();
+    document.getElementById('league-table-wrap').innerHTML = '<div class="empty">Add matches and click Refresh.</div>';
     document.getElementById('result-box').style.display = 'none';
     _lastPredictionId = null;
-  } catch (_) {}
+  } catch(_) {}
 }
 
 // ── predict ────────────────────────────────────────────────────────────────
@@ -892,22 +868,16 @@ async function resetAll() {
 async function runPrediction() {
   const home = document.getElementById('p-home').value.trim();
   const away = document.getElementById('p-away').value.trim();
-  const oh   = parseFloat(document.getElementById('p-oh').value) || 0;
-  const od   = parseFloat(document.getElementById('p-od').value) || 0;
-  const oa   = parseFloat(document.getElementById('p-oa').value) || 0;
+  const oh = parseFloat(document.getElementById('p-oh').value) || 0;
+  const od = parseFloat(document.getElementById('p-od').value) || 0;
+  const oa = parseFloat(document.getElementById('p-oa').value) || 0;
 
   if (!home || !away) { msg('predict-msg', 'Enter both team names.', false); return; }
-  if (home.toLowerCase() === away.toLowerCase()) {
-    msg('predict-msg', 'Home and away teams must be different.', false); return;
-  }
+  if (home.toLowerCase() === away.toLowerCase()) { msg('predict-msg', 'Teams must be different.', false); return; }
 
   setLoading('btn-predict', true);
   try {
-    const res  = await fetch(`${API}/predict`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ home_team: home, away_team: away, odds_h: oh, odds_d: od, odds_a: oa }),
-    });
+    const res = await fetch(`${API}/predict`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ home_team: home, away_team: away, odds_h: oh, odds_d: od, odds_a: oa }) });
     const data = await res.json();
     if (!res.ok) { msg('predict-msg', data.detail || 'Prediction failed.', false); return; }
 
@@ -915,44 +885,44 @@ async function runPrediction() {
     msg('predict-msg', '', true);
     renderResult(data);
 
-    // Reset result inputs
-    document.getElementById('rr-home').value = 0;
-    document.getElementById('rr-away').value = 0;
-    document.getElementById('record-msg').textContent = '';
-    document.getElementById('record-msg').style.display = 'none';
-  } catch (_) { msg('predict-msg', 'Network error.', false); }
-  setLoading('btn-predict', false, 'Predict Match');
+    // Add to session queue
+    const already = _queuedPredictions.find(p => p.id === data.prediction_id);
+    if (!already) {
+      _queuedPredictions.unshift({ id: data.prediction_id, home: data.home_team, away: data.away_team, prediction: data.prediction, confidence: data.confidence });
+      renderQueue();
+    }
+
+    // Show "queued" note
+    document.getElementById('r-queued-note').style.display = 'inline';
+    setTimeout(() => { document.getElementById('r-queued-note').style.display = 'none'; }, 3000);
+
+    // Refresh pending badge
+    refreshPendingCount();
+  } catch(_) { msg('predict-msg', 'Network error.', false); }
+  setLoading('btn-predict', false);
 }
 
 function renderResult(d) {
   document.getElementById('result-box').style.display = 'block';
-
-  document.getElementById('r-headline').textContent =
-    `${d.home_team}  ${d.probabilities.home}%  –  ${d.probabilities.away}%  ${d.away_team}`;
-  document.getElementById('r-sub').innerHTML =
-    `Prediction: <strong>${d.prediction}</strong> &nbsp;·&nbsp; Confidence: <span class="confidence-badge">${d.confidence}%</span>`;
-
+  document.getElementById('r-headline').textContent = `${d.home_team}  vs  ${d.away_team}`;
+  document.getElementById('r-prediction-label').textContent = `Prediction: ${d.prediction}`;
+  document.getElementById('r-confidence').textContent = `${d.confidence}% confidence`;
   document.getElementById('r-home-label').textContent = d.home_team;
   document.getElementById('r-away-label').textContent = d.away_team;
   document.getElementById('r-home-pct').textContent = d.probabilities.home + '%';
   document.getElementById('r-draw-pct').textContent = d.probabilities.draw + '%';
   document.getElementById('r-away-pct').textContent = d.probabilities.away + '%';
-  
-  const homeBar = document.getElementById('r-home-bar');
-  const drawBar = document.getElementById('r-draw-bar');
-  const awayBar = document.getElementById('r-away-bar');
-  
-  homeBar.style.width = d.probabilities.home + '%';
-  drawBar.style.width = d.probabilities.draw + '%';
-  awayBar.style.width = d.probabilities.away + '%';
 
-  // Highlight winner bar
-  homeBar.classList.remove('winner');
-  drawBar.classList.remove('winner');
-  awayBar.classList.remove('winner');
-  if (d.prediction === 'H') homeBar.classList.add('winner');
-  if (d.prediction === 'D') drawBar.classList.add('winner');
-  if (d.prediction === 'A') awayBar.classList.add('winner');
+  const hb = document.getElementById('r-home-bar');
+  const db = document.getElementById('r-draw-bar');
+  const ab = document.getElementById('r-away-bar');
+  hb.style.width = d.probabilities.home + '%';
+  db.style.width = d.probabilities.draw + '%';
+  ab.style.width = d.probabilities.away + '%';
+  [hb, db, ab].forEach(b => b.classList.remove('winner'));
+  if (d.prediction === 'Home Win') hb.classList.add('winner');
+  if (d.prediction === 'Draw') db.classList.add('winner');
+  if (d.prediction === 'Away Win') ab.classList.add('winner');
 
   const tbody = document.getElementById('r-breakdown-body');
   tbody.innerHTML = '';
@@ -962,42 +932,191 @@ function renderResult(d) {
     tr.innerHTML = `<td>${srcLabels[src] || src}</td><td>${p.home}%</td><td>${p.draw}%</td><td>${p.away}%</td>`;
     tbody.appendChild(tr);
   }
-  const cr = document.createElement('tr');
-  cr.className = 'combined-row';
+  const cr = document.createElement('tr'); cr.className = 'combined-row';
   cr.innerHTML = `<td>Combined</td><td>${d.probabilities.home}%</td><td>${d.probabilities.draw}%</td><td>${d.probabilities.away}%</td>`;
   tbody.appendChild(cr);
 }
 
-// ── record result (score → auto-derive outcome) ────────────────────────────
+// ── session queue ──────────────────────────────────────────────────────────
 
-async function recordResult() {
-  if (!_lastPredictionId) {
-    msg('record-msg', 'Run a prediction first.', false); return;
+function renderQueue() {
+  const empty = document.getElementById('queue-empty');
+  const list = document.getElementById('queue-list');
+  const tbody = document.getElementById('queue-tbody');
+  const qc = document.getElementById('queue-count');
+
+  if (!_queuedPredictions.length) {
+    empty.style.display = 'block'; list.style.display = 'none';
+    qc.textContent = ''; return;
   }
-  const hs = parseInt(document.getElementById('rr-home').value);
-  const as_ = parseInt(document.getElementById('rr-away').value);
-  if (isNaN(hs) || isNaN(as_) || hs < 0 || as_ < 0) {
-    msg('record-msg', 'Enter valid non-negative scores.', false); return;
-  }
-
-  setLoading('btn-record', true);
-  try {
-    const res = await fetch(`${API}/predictions/result`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prediction_id: _lastPredictionId, home_score: hs, away_score: as_ }),
-    });
-    const data = await res.json();
-    if (!res.ok) { msg('record-msg', data.detail || 'Error saving result.', false); return; }
-
-    const tick = data.is_correct ? '✓ Correct' : '✗ Wrong';
-    msg('record-msg', `Saved: ${data.outcome_label}  ${tick}`, data.is_correct);
-    _lastPredictionId = null;  // prevent double-submit
-  } catch (_) { msg('record-msg', 'Network error.', false); }
-  setLoading('btn-record', false, 'Save Result');
+  empty.style.display = 'none'; list.style.display = 'block';
+  qc.textContent = `(${_queuedPredictions.length})`;
+  tbody.innerHTML = '';
+  _queuedPredictions.forEach(p => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td style="font-weight:500">${esc(p.home)} <span style="color:var(--text-muted);font-weight:400">vs</span> ${esc(p.away)}</td>
+      <td><span class="badge pending">${esc(p.prediction)}</span></td>
+      <td style="color:var(--text-muted)">${p.confidence}%</td>
+      <td><button class="ghost" onclick="prefillResult(${p.id},'${esc(p.home)}','${esc(p.away)}')">Enter result</button></td>`;
+    tbody.appendChild(tr);
+  });
 }
 
-// ── league table ───────────────────────────────────────────────────────────
+function prefillResult(predId, home, away) {
+  showPage('history', document.getElementById('tab-history'));
+  // Small delay to let the tab render
+  setTimeout(() => {
+    const row = document.getElementById(`pending-row-${predId}`);
+    if (row) { row.scrollIntoView({ behavior: 'smooth', block: 'center' }); row.style.background = '#EEEDFE'; setTimeout(() => row.style.background = '', 1200); }
+  }, 200);
+}
+
+// ── pending count badge ─────────────────────────────────────────────────────
+
+async function refreshPendingCount() {
+  try {
+    const rows = await fetch(`${API}/predictions/history?limit=200`).then(r => r.json());
+    const pending = rows.filter(r => !r.outcome).length;
+    updatePendingBadge(pending);
+  } catch(_) {}
+}
+
+// ── history / fixtures ─────────────────────────────────────────────────────
+
+async function loadHistory() {
+  try {
+    const filter = document.getElementById('history-filter').value;
+    const rows = await fetch(`${API}/predictions/history?limit=200`).then(r => r.json());
+
+    // Separate pending vs evaluated
+    const pending = rows.filter(r => !r.outcome);
+    const evaluated = rows.filter(r => r.outcome);
+
+    updatePendingBadge(pending.length);
+
+    // Build pending batch section
+    const ps = document.getElementById('pending-section');
+    const pr = document.getElementById('pending-rows');
+    const pcl = document.getElementById('pending-count-label');
+
+    if (pending.length > 0 && filter !== 'evaluated') {
+      ps.style.display = 'block';
+      pcl.textContent = `${pending.length} fixture${pending.length !== 1 ? 's' : ''} awaiting results`;
+      pr.innerHTML = '';
+      pending.forEach(p => {
+        const predLabels = { H: 'Home Win', D: 'Draw', A: 'Away Win' };
+        const predShort = p.prediction;
+        const div = document.createElement('div');
+        div.id = `pending-row-${p.id}`;
+        div.style.cssText = 'padding:10px 16px;border-bottom:0.5px solid var(--border-light);display:flex;align-items:center;gap:12px;flex-wrap:wrap;transition:background 0.3s';
+        div.innerHTML = `
+          <div style="flex:1;min-width:180px">
+            <span style="font-weight:500">${esc(p.home_team)}</span>
+            <span style="color:var(--text-muted);margin:0 6px">vs</span>
+            <span style="font-weight:500">${esc(p.away_team)}</span>
+            <span style="display:block;font-size:11px;color:var(--text-muted);margin-top:2px">${fmtDateTime(p.created_at)}</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:6px">
+            <span class="badge pending">${predShort}</span>
+            <span style="font-size:11px;color:var(--text-muted)">${p.confidence}%</span>
+          </div>
+          <div class="result-entry-row" id="entry-${p.id}">
+            <label style="margin:0;font-size:11px;color:var(--text-muted)">Score:</label>
+            <input type="number" id="rr-h-${p.id}" min="0" value="" placeholder="H" title="${esc(p.home_team)} goals" style="width:52px;padding:5px 8px;font-size:13px">
+            <span class="vs">–</span>
+            <input type="number" id="rr-a-${p.id}" min="0" value="" placeholder="A" title="${esc(p.away_team)} goals" style="width:52px;padding:5px 8px;font-size:13px">
+            <button class="success" style="padding:5px 12px;font-size:12px" onclick="saveResult(${p.id})">Save</button>
+            <span id="entry-msg-${p.id}" style="font-size:11px"></span>
+          </div>`;
+        pr.appendChild(div);
+      });
+    } else {
+      ps.style.display = 'none';
+    }
+
+    // Build full history table
+    const wrap = document.getElementById('pred-table-wrap');
+    let displayRows = rows;
+    if (filter === 'pending') displayRows = pending;
+    if (filter === 'evaluated') displayRows = evaluated;
+
+    if (!displayRows.length) {
+      wrap.innerHTML = `<div class="empty">${filter === 'pending' ? 'No pending fixtures — all results entered.' : filter === 'evaluated' ? 'No evaluated predictions yet.' : 'No predictions recorded yet.'}</div>`;
+      return;
+    }
+
+    let html = `<table><thead><tr>
+      <th>#</th><th>When</th><th>Match</th>
+      <th>Prediction</th><th>Conf.</th>
+      <th>H%</th><th>D%</th><th>A%</th>
+      <th>Score</th><th>Outcome</th>
+    </tr></thead><tbody>`;
+
+    displayRows.forEach(r => {
+      const pred = r.prediction;
+      let resultCell = '—';
+      if (r.actual_home_score !== null && r.actual_away_score !== null) resultCell = `${r.actual_home_score} – ${r.actual_away_score}`;
+      let outcomeBadge = '<span class="badge pending">Pending</span>';
+      if (r.outcome) {
+        const predLabels = { H: 'Home Win', D: 'Draw', A: 'Away Win' };
+        outcomeBadge = `<span class="badge ${r.is_correct ? 'correct' : 'wrong'}">${predLabels[r.outcome] || r.outcome}</span>`;
+      }
+      html += `<tr>
+        <td style="color:#B4B2A9;font-size:11px">${r.id}</td>
+        <td style="white-space:nowrap;font-size:11px;color:var(--text-muted)">${fmtDateTime(r.created_at)}</td>
+        <td style="white-space:nowrap;font-weight:500;font-size:12px">${esc(r.home_team)} <span style="color:var(--text-muted);font-weight:400">vs</span> ${esc(r.away_team)}</td>
+        <td style="font-size:12px">${pred}</td>
+        <td style="font-size:12px">${r.confidence}%</td>
+        <td style="font-size:12px">${r.prob_home}%</td>
+        <td style="font-size:12px">${r.prob_draw}%</td>
+        <td style="font-size:12px">${r.prob_away}%</td>
+        <td style="font-variant-numeric:tabular-nums;font-size:12px">${resultCell}</td>
+        <td>${outcomeBadge}</td>
+      </tr>`;
+    });
+    html += '</tbody></table>';
+    wrap.innerHTML = html;
+  } catch(_) {}
+}
+
+// ── save result (from history inline form) ─────────────────────────────────
+
+async function saveResult(predId) {
+  const hInput = document.getElementById(`rr-h-${predId}`);
+  const aInput = document.getElementById(`rr-a-${predId}`);
+  const statusEl = document.getElementById(`entry-msg-${predId}`);
+  const hs = parseInt(hInput.value);
+  const as_ = parseInt(aInput.value);
+
+  if (isNaN(hs) || isNaN(as_) || hs < 0 || as_ < 0 || hInput.value === '' || aInput.value === '') {
+    statusEl.textContent = 'Enter both scores.'; statusEl.className = 'save-err'; return;
+  }
+
+  const btn = document.querySelector(`#entry-${predId} button`);
+  if (btn) { btn.disabled = true; btn.textContent = '…'; }
+
+  try {
+    const res = await fetch(`${API}/predictions/result`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ prediction_id: predId, home_score: hs, away_score: as_ }) });
+    const data = await res.json();
+    if (!res.ok) { statusEl.textContent = data.detail || 'Error saving.'; statusEl.className = 'save-err'; if (btn) { btn.disabled = false; btn.textContent = 'Save'; } return; }
+
+    const icon = data.is_correct ? '✓' : '✗';
+    statusEl.textContent = `${icon} ${data.outcome_label}`;
+    statusEl.className = data.is_correct ? 'save-ok' : 'save-err';
+
+    // Remove from session queue
+    _queuedPredictions = _queuedPredictions.filter(p => p.id !== predId);
+    renderQueue();
+
+    // Animate & reload after a brief moment
+    const row = document.getElementById(`pending-row-${predId}`);
+    if (row) { row.style.opacity = '0.5'; row.style.transition = 'opacity 0.4s'; }
+    setTimeout(() => loadHistory(), 600);
+  } catch(_) { statusEl.textContent = 'Network error.'; statusEl.className = 'save-err'; if (btn) { btn.disabled = false; btn.textContent = 'Save'; } }
+}
+
+// ── league table ──────────────────────────────────────────────────────────
 
 function toggleLeague() {
   document.getElementById('league-hdr').classList.toggle('open');
@@ -1007,164 +1126,73 @@ function toggleLeague() {
 async function loadTable() {
   try {
     const table = await fetch(`${API}/table`).then(r => r.json());
-    const wrap  = document.getElementById('league-table-wrap');
-    if (!table.length) {
-      wrap.innerHTML = '<div class="empty">No data yet.</div>'; return;
-    }
-    let html = `<table>
-      <thead><tr><th>#</th><th>Team</th><th>P</th><th>Pts</th><th>GD</th><th>GF</th><th>GA</th><th>Form</th></tr></thead>
-      <tbody>`;
+    const wrap = document.getElementById('league-table-wrap');
+    if (!table.length) { wrap.innerHTML = '<div class="empty">No data yet.</div>'; return; }
+    let html = `<table><thead><tr><th>#</th><th>Team</th><th>P</th><th>Pts</th><th>GD</th><th>GF</th><th>GA</th><th>Form</th></tr></thead><tbody>`;
     table.forEach(r => {
       const form = r.form.split('').map(c => {
-        const color = c==='W'?'var(--success)':c==='L'?'var(--danger)':'var(--secondary)';
-        return `<span style="color:${color};font-weight:700">${c}</span>`;
+        const col = c==='W'?'var(--success)':c==='L'?'var(--danger)':'var(--secondary)';
+        return `<span style="color:${col};font-weight:600">${c}</span>`;
       }).join(' ');
-      html += `<tr>
-        <td>${r.position}</td><td style="font-weight:600">${esc(r.team)}</td>
-        <td>${r.played}</td><td><strong>${r.points}</strong></td>
-        <td>${r.gd>=0?'+':''}${r.gd}</td><td>${r.scored}</td><td>${r.conceded}</td>
-        <td style="letter-spacing:2px">${form}</td>
-      </tr>`;
+      html += `<tr><td>${r.position}</td><td style="font-weight:500">${esc(r.team)}</td><td>${r.played}</td><td><strong>${r.points}</strong></td><td>${r.gd>=0?'+':''}${r.gd}</td><td>${r.scored}</td><td>${r.conceded}</td><td style="letter-spacing:2px">${form}</td></tr>`;
     });
     html += '</tbody></table>';
     wrap.innerHTML = html;
     document.getElementById('league-hdr').classList.add('open');
     document.getElementById('league-body').classList.add('open');
-  } catch (_) {}
+  } catch(_) {}
 }
 
-// ── prediction history ─────────────────────────────────────────────────────
-
-async function loadHistory() {
-  try {
-    const rows = await fetch(`${API}/predictions/history?limit=100`).then(r => r.json());
-    const wrap = document.getElementById('pred-table-wrap');
-
-    if (!rows.length) {
-      wrap.innerHTML = '<div class="empty">No predictions recorded yet. Run a prediction first.</div>';
-      return;
-    }
-
-    let html = `<table>
-      <thead>
-        <tr>
-          <th>#</th><th>When</th><th>Match</th>
-          <th>Pred</th><th>Conf</th>
-          <th>H%</th><th>D%</th><th>A%</th>
-          <th>Result</th><th>Outcome</th>
-        </tr>
-      </thead><tbody>`;
-
-    rows.forEach(r => {
-      const pred_label = { H:'Home Win', D:'Draw', A:'Away Win' };
-      let resultCell = '—';
-      if (r.actual_home_score !== null && r.actual_away_score !== null) {
-        resultCell = `${r.actual_home_score} – ${r.actual_away_score}`;
-      }
-      let outcomeBadge = '<span class="outcome-badge pending">Pending</span>';
-      if (r.outcome) {
-        const correct = r.is_correct;
-        const label   = pred_label[r.outcome] || r.outcome;
-        const cls     = correct ? 'correct' : 'wrong';
-        outcomeBadge  = `<span class="outcome-badge ${cls}">${label}</span>`;
-      }
-      html += `<tr>
-        <td style="color:#aaa;font-size:12px">${r.id}</td>
-        <td style="white-space:nowrap;font-size:12px;color:var(--text-muted)">${fmtDateTime(r.created_at)}</td>
-        <td style="white-space:nowrap;font-weight:500">${esc(r.home_team)} vs ${esc(r.away_team)}</td>
-        <td>${pred_label[r.prediction] || r.prediction}</td>
-        <td>${r.confidence}%</td>
-        <td>${r.prob_home}%</td>
-        <td>${r.prob_draw}%</td>
-        <td>${r.prob_away}%</td>
-        <td style="font-variant-numeric:tabular-nums">${resultCell}</td>
-        <td>${outcomeBadge}</td>
-      </tr>`;
-    });
-    html += '</tbody></table>';
-    wrap.innerHTML = html;
-  } catch (_) {}
-}
-
-// ── evaluate ───────────────────────────────────────────────────────────────
+// ── evaluate ──────────────────────────────────────────────────────────────
 
 async function runEvaluate() {
   setLoading('btn-evaluate', true);
   try {
     const data = await fetch(`${API}/evaluate`).then(r => r.json());
-    const emptyEl   = document.getElementById('eval-empty');
+    const emptyEl = document.getElementById('eval-empty');
     const resultsEl = document.getElementById('eval-results');
+    if (!data.n_evaluated) { emptyEl.style.display = 'block'; resultsEl.style.display = 'none'; return; }
+    emptyEl.style.display = 'none'; resultsEl.style.display = 'block';
 
-    if (!data.n_evaluated) {
-      emptyEl.style.display   = 'block';
-      resultsEl.style.display = 'none';
-      return;
-    }
+    document.getElementById('eval-stats').innerHTML = `
+      <div class="eval-stat"><div class="val">${data.n_evaluated}</div><div class="lbl">Evaluated predictions</div></div>
+      <div class="eval-stat"><div class="val">${data.accuracy}%</div><div class="lbl">Accuracy (secondary)</div></div>
+      <div class="eval-stat"><div class="val">${data.avg_log_loss}</div><div class="lbl">Avg log-loss ↓ lower is better</div></div>`;
 
-    emptyEl.style.display   = 'none';
-    resultsEl.style.display = 'block';
-
-    // Stats grid
-    const statsEl = document.getElementById('eval-stats');
-    statsEl.innerHTML = `
-      <div class="eval-stat">
-        <div class="val">${data.n_evaluated}</div>
-        <div class="lbl">Evaluated predictions</div>
-      </div>
-      <div class="eval-stat">
-        <div class="val">${data.accuracy}%</div>
-        <div class="lbl">Accuracy (secondary metric)</div>
-      </div>
-      <div class="eval-stat">
-        <div class="val">${data.avg_log_loss}</div>
-        <div class="lbl">Avg log-loss ↓ lower is better</div>
-      </div>
-    `;
-
-    // Calibration chart
     const calEl = document.getElementById('eval-calibration');
-    if (!data.calibration?.length) {
-      calEl.innerHTML = '<div class="empty">No calibration data yet.</div>';
-      return;
-    }
-
+    if (!data.calibration?.length) { calEl.innerHTML = '<div class="empty">No calibration data yet.</div>'; return; }
     let calHtml = '';
     data.calibration.forEach(c => {
       if (c.n === 0) return;
-      const predPct   = Math.round(c.predicted_rate * 100);
+      const predPct = Math.round(c.predicted_rate * 100);
       const actualPct = c.actual_rate !== null ? Math.round(c.actual_rate * 100) : null;
-      const gap       = c.gap;
-      let gapHtml = '<span style="color:#aaa">—</span>';
+      const gap = c.gap;
+      let gapHtml = '<span style="color:#B4B2A9">—</span>';
       if (gap !== null) {
         const sign = gap > 0 ? '+' : '';
-        const cls  = gap > 0.05 ? 'cal-gap-pos' : gap < -0.05 ? 'cal-gap-neg' : '';
+        const cls = gap > 0.05 ? 'cal-gap-pos' : gap < -0.05 ? 'cal-gap-neg' : '';
         gapHtml = `<span class="${cls}">${sign}${Math.round(gap*100)}%</span>`;
       }
-      calHtml += `
-        <div class="cal-row">
-          <div class="cal-bucket">${c.label}</div>
-          <div class="cal-bar-wrap">
-            <div class="cal-bar-pred"  style="width:${predPct}%"></div>
-            ${actualPct !== null
-              ? `<div class="cal-bar-actual" style="width:${actualPct}%"></div>`
-              : ''}
-          </div>
-          <div class="cal-meta">
-            ${actualPct !== null ? `actual&nbsp;<strong>${actualPct}%</strong>` : '<span style="color:#aaa">no data</span>'}
-            &nbsp;${gapHtml}
-          </div>
-          <div class="cal-n">n=${c.n}</div>
-        </div>`;
+      calHtml += `<div class="cal-row">
+        <div class="cal-bucket">${c.label}</div>
+        <div class="cal-bar-wrap">
+          <div class="cal-bar-pred" style="width:${predPct}%"></div>
+          ${actualPct !== null ? `<div class="cal-bar-actual" style="width:${actualPct}%"></div>` : ''}
+        </div>
+        <div class="cal-meta">${actualPct !== null ? `actual <strong>${actualPct}%</strong>` : '<span style="color:#B4B2A9">no data</span>'} &nbsp;${gapHtml}</div>
+        <div class="cal-n">n=${c.n}</div>
+      </div>`;
     });
     calEl.innerHTML = calHtml || '<div class="empty">No calibration data yet.</div>';
-  } catch (_) {}
-  setLoading('btn-evaluate', false, 'Run Evaluation');
+  } catch(_) {}
+  setLoading('btn-evaluate', false);
 }
 
-// ── init ───────────────────────────────────────────────────────────────────
+// ── init ──────────────────────────────────────────────────────────────────
 (async () => {
   await loadMatches();
   await refreshTeamList();
+  await refreshPendingCount();
 })();
 </script>
 </body>
