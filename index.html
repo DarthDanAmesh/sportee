@@ -6,386 +6,142 @@
 <title>Match Predictor</title>
 <style>
   :root {
-    --primary: #185FA5;
-    --primary-light: #E6F1FB;
-    --primary-mid: #378ADD;
-    --secondary: #5F5E5A;
-    --secondary-light: #F1EFE8;
-    --danger: #A32D2D;
-    --danger-light: #FCEBEB;
-    --success: #3B6D11;
-    --success-light: #EAF3DE;
-    --warning: #854F0B;
-    --warning-light: #FAEEDA;
-    --pending: #533AB7;
-    --pending-light: #EEEDFE;
-
-    --bg: #F6F5F0;
-    --card-bg: #ffffff;
-    --text: #2C2C2A;
-    --text-muted: #5F5E5A;
-    --border: #D3D1C7;
-    --border-light: #E8E7E2;
-
-    --radius: 8px;
-    --radius-lg: 12px;
+    --primary: #185FA5; --primary-light: #E6F1FB; --primary-mid: #378ADD;
+    --secondary: #5F5E5A; --secondary-light: #F1EFE8;
+    --danger: #A32D2D; --danger-light: #FCEBEB;
+    --success: #3B6D11; --success-light: #EAF3DE;
+    --warning: #854F0B; --warning-light: #FAEEDA;
+    --pending: #533AB7; --pending-light: #EEEDFE;
+    --bg: #F6F5F0; --card-bg: #ffffff; --text: #2C2C2A; --text-muted: #5F5E5A;
+    --border: #D3D1C7; --border-light: #E8E7E2;
+    --radius: 8px; --radius-lg: 12px;
     --shadow: 0 1px 3px rgba(0,0,0,0.06), 0 1px 2px rgba(0,0,0,0.04);
   }
-
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-  body {
-    font-family: system-ui, -apple-system, sans-serif;
-    font-size: 14px;
-    background: var(--bg);
-    color: var(--text);
-    padding: 32px 24px;
-    line-height: 1.5;
-  }
-
-  .app-header {
-    display: flex;
-    align-items: baseline;
-    gap: 12px;
-    margin-bottom: 28px;
-  }
+  body { font-family: system-ui, -apple-system, sans-serif; font-size: 14px; background: var(--bg); color: var(--text); padding: 32px 24px; line-height: 1.5; }
+  .app-header { display: flex; align-items: baseline; gap: 12px; margin-bottom: 28px; }
   .app-header h1 { font-size: 22px; font-weight: 500; color: var(--text); }
   .app-header .subtitle { font-size: 13px; color: var(--text-muted); }
-
   h2 { font-size: 15px; font-weight: 500; margin-bottom: 16px; color: var(--text); }
   h3 { font-size: 13px; font-weight: 500; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.06em; margin-bottom: 12px; }
-
-  .layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-    max-width: 1100px;
-  }
-  @media (max-width: 768px) {
-    .layout { grid-template-columns: 1fr; }
-    body { padding: 16px 12px; }
-  }
-
-  .card {
-    background: var(--card-bg);
-    border: 0.5px solid var(--border);
-    padding: 20px;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-  }
+  .layout { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; max-width: 1100px; }
+  @media (max-width: 768px) { .layout { grid-template-columns: 1fr; } body { padding: 16px 12px; } }
+  .card { background: var(--card-bg); border: 0.5px solid var(--border); padding: 20px; border-radius: var(--radius-lg); box-shadow: var(--shadow); }
   .card.full { grid-column: 1 / -1; }
-
-  label {
-    display: block;
-    font-size: 12px;
-    color: var(--text-muted);
-    margin-bottom: 5px;
-    font-weight: 500;
+  label { display: block; font-size: 12px; color: var(--text-muted); margin-bottom: 5px; font-weight: 500; }
+  input[type="text"], input[type="number"], input[type="date"], input[type="file"], select {
+    width: 100%; padding: 8px 10px; border: 0.5px solid var(--border); border-radius: var(--radius);
+    font-size: 13px; font-family: inherit; background: #fff; color: var(--text); transition: border-color 0.15s, box-shadow 0.15s;
   }
-
-  input[type="text"],
-  input[type="number"],
-  input[type="date"],
-  input[type="file"],
-  select {
-    width: 100%;
-    padding: 8px 10px;
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 13px;
-    font-family: inherit;
-    background: #fff;
-    color: var(--text);
-    transition: border-color 0.15s, box-shadow 0.15s;
-  }
-  input:focus, select:focus {
-    outline: none;
-    border-color: var(--primary-mid);
-    box-shadow: 0 0 0 3px rgba(55,138,221,0.12);
-  }
-
+  input:focus, select:focus { outline: none; border-color: var(--primary-mid); box-shadow: 0 0 0 3px rgba(55,138,221,0.12); }
   .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
   .row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px; }
-
   .field { margin-bottom: 12px; }
+  .team-swap-row { display: grid; grid-template-columns: 1fr auto 1fr; gap: 10px; align-items: end; margin-bottom: 12px; }
 
-  .team-swap-row {
-    display: grid;
-    grid-template-columns: 1fr auto 1fr;
-    gap: 10px;
-    align-items: end;
-    margin-bottom: 12px;
-  }
+  /* FIX: will-change on swap-btn prevents layout recalc on hover transform */
   .swap-btn {
-    padding: 0 10px;
-    height: 36px;
-    background: var(--secondary-light);
-    color: var(--text);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 16px;
-    cursor: pointer;
-    transition: background 0.15s, transform 0.2s;
+    padding: 0 10px; height: 36px; background: var(--secondary-light); color: var(--text);
+    border: 0.5px solid var(--border); border-radius: var(--radius); font-size: 16px;
+    cursor: pointer; will-change: transform; transition: background 0.15s, transform 0.2s;
   }
   .swap-btn:hover { background: var(--border); transform: rotate(180deg); }
 
-  button {
-    padding: 8px 16px;
-    background: var(--primary);
-    color: #fff;
-    border: none;
-    border-radius: var(--radius);
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    font-family: inherit;
-    transition: background 0.15s, opacity 0.15s;
-  }
+  button { padding: 8px 16px; background: var(--primary); color: #fff; border: none; border-radius: var(--radius); font-size: 13px; font-weight: 500; cursor: pointer; font-family: inherit; transition: background 0.15s, opacity 0.15s; }
   button:hover { background: #0C447C; }
   button:disabled { opacity: 0.5; cursor: not-allowed; }
-  button.danger { background: var(--danger); }
-  button.danger:hover { background: #791F1F; }
-  button.secondary { background: transparent; color: var(--text-muted); border: 0.5px solid var(--border); }
-  button.secondary:hover { background: var(--secondary-light); }
-  button.success { background: var(--success); }
-  button.success:hover { background: #27500A; }
-  button.ghost { background: transparent; color: var(--primary); border: 0.5px solid var(--primary-light); padding: 5px 12px; font-size: 12px; }
-  button.ghost:hover { background: var(--primary-light); }
-
-  .msg {
-    margin-top: 10px;
-    font-size: 12px;
-    padding: 8px 10px;
-    border-radius: var(--radius);
-    display: none;
-  }
-  .msg.ok  { background: var(--success-light); color: #27500A; display: block; }
+  button.danger { background: var(--danger); } button.danger:hover { background: #791F1F; }
+  button.secondary { background: transparent; color: var(--text-muted); border: 0.5px solid var(--border); } button.secondary:hover { background: var(--secondary-light); }
+  button.success { background: var(--success); } button.success:hover { background: #27500A; }
+  button.ghost { background: transparent; color: var(--primary); border: 0.5px solid var(--primary-light); padding: 5px 12px; font-size: 12px; } button.ghost:hover { background: var(--primary-light); }
+  .msg { margin-top: 10px; font-size: 12px; padding: 8px 10px; border-radius: var(--radius); display: none; }
+  .msg.ok { background: var(--success-light); color: #27500A; display: block; }
   .msg.err { background: var(--danger-light); color: #791F1F; display: block; }
-
-  /* Tables */
   table { width: 100%; border-collapse: collapse; font-size: 13px; }
-  th {
-    text-align: left;
-    padding: 8px 10px;
-    border-bottom: 0.5px solid var(--border);
-    font-weight: 500;
-    color: var(--text-muted);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    background: var(--bg);
-  }
+  th { text-align: left; padding: 8px 10px; border-bottom: 0.5px solid var(--border); font-weight: 500; color: var(--text-muted); font-size: 11px; text-transform: uppercase; letter-spacing: 0.05em; background: var(--bg); }
   td { padding: 10px; border-bottom: 0.5px solid var(--border-light); vertical-align: middle; }
-  tr:last-child td { border-bottom: none; }
-  tr:hover td { background: #FAFAF8; }
+  tr:last-child td { border-bottom: none; } tr:hover td { background: #FAFAF8; }
   td button { padding: 3px 8px; font-size: 11px; }
   #match-list-wrap, #pred-table-wrap { max-height: 420px; overflow-y: auto; }
-
-  /* Page Tabs */
-  .page-tabs {
-    display: flex;
-    gap: 2px;
-    margin-bottom: 24px;
-    border-bottom: 0.5px solid var(--border);
-  }
-  .page-tab {
-    padding: 9px 18px;
-    border: none;
-    background: transparent;
-    cursor: pointer;
-    font-size: 13px;
-    font-weight: 500;
-    font-family: inherit;
-    color: var(--text-muted);
-    position: relative;
-    top: 0.5px;
-    border-bottom: 2px solid transparent;
-    border-radius: var(--radius) var(--radius) 0 0;
-    transition: color 0.15s;
-  }
+  .page-tabs { display: flex; gap: 2px; margin-bottom: 24px; border-bottom: 0.5px solid var(--border); }
+  .page-tab { padding: 9px 18px; border: none; background: transparent; cursor: pointer; font-size: 13px; font-weight: 500; font-family: inherit; color: var(--text-muted); position: relative; top: 0.5px; border-bottom: 2px solid transparent; border-radius: var(--radius) var(--radius) 0 0; transition: color 0.15s; }
   .page-tab.active { color: var(--primary); border-bottom-color: var(--primary); }
   .page-tab:hover:not(.active) { color: var(--text); background: var(--secondary-light); }
-
-  /* Badge on tab */
-  .tab-badge {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 18px;
-    height: 18px;
-    padding: 0 5px;
-    border-radius: 9px;
-    font-size: 10px;
-    font-weight: 600;
-    background: var(--pending);
-    color: #fff;
-    margin-left: 6px;
-    vertical-align: middle;
-  }
+  .tab-badge { display: inline-flex; align-items: center; justify-content: center; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; font-size: 10px; font-weight: 600; background: var(--pending); color: #fff; margin-left: 6px; vertical-align: middle; }
   .tab-badge:empty { display: none; }
-
-  .page-panel { display: none; }
-  .page-panel.active { display: block; }
+  .page-panel { display: none; } .page-panel.active { display: block; }
   .empty { color: var(--text-muted); font-size: 13px; padding: 24px 0; text-align: center; }
-
-  /* Outcome badges */
-  .badge {
-    display: inline-block;
-    padding: 2px 8px;
-    border-radius: 10px;
-    font-size: 11px;
-    font-weight: 600;
-    white-space: nowrap;
-  }
-  .badge.pending  { background: var(--pending-light); color: var(--pending); }
-  .badge.correct  { background: var(--success-light); color: var(--success); }
-  .badge.wrong    { background: var(--danger-light); color: var(--danger); }
-
-  /* Prob bars */
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+  .badge.pending { background: var(--pending-light); color: var(--pending); }
+  .badge.correct { background: var(--success-light); color: var(--success); }
+  .badge.wrong { background: var(--danger-light); color: var(--danger); }
   .prob-bar-wrap { margin-bottom: 12px; }
-  .prob-label {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    margin-bottom: 4px;
-    font-weight: 500;
-    color: var(--text);
-  }
+  .prob-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 4px; font-weight: 500; color: var(--text); }
   .prob-bar-bg { background: var(--border-light); border-radius: 3px; height: 8px; overflow: hidden; }
   .prob-bar-fill { height: 8px; border-radius: 3px; transition: width .35s ease-out; }
-  .prob-bar-fill.home { background: var(--primary-mid); }
-  .prob-bar-fill.draw { background: var(--secondary); }
-  .prob-bar-fill.away { background: #D85A30; }
+  .prob-bar-fill.home { background: var(--primary-mid); } .prob-bar-fill.draw { background: var(--secondary); } .prob-bar-fill.away { background: #D85A30; }
   .prob-bar-fill.winner { box-shadow: inset 0 0 0 1.5px rgba(0,0,0,0.15); }
-
-  /* Result box */
   #result-box { display: none; margin-top: 20px; padding-top: 20px; border-top: 0.5px solid var(--border-light); }
   .result-headline { font-size: 16px; font-weight: 500; margin-bottom: 6px; }
   .result-sub { color: var(--text-muted); margin-bottom: 18px; font-size: 13px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
   .confidence-badge { background: var(--primary-light); color: var(--primary); padding: 2px 10px; border-radius: 10px; font-size: 11px; font-weight: 600; }
-
-  .breakdown-table th { text-align: right; background: transparent; }
-  .breakdown-table th:first-child { text-align: left; }
-  .breakdown-table td { text-align: right; }
-  .breakdown-table td:first-child { text-align: left; font-weight: 500; }
+  .breakdown-table th { text-align: right; background: transparent; } .breakdown-table th:first-child { text-align: left; }
+  .breakdown-table td { text-align: right; } .breakdown-table td:first-child { text-align: left; font-weight: 500; }
   .breakdown-table tr.combined-row td { border-top: 0.5px solid var(--border); font-weight: 600; background: #FAFAF8; }
-
-  /* Queue section in history tab */
-  .pending-section {
-    margin-bottom: 24px;
-    border-radius: var(--radius-lg);
-    overflow: hidden;
-    border: 0.5px solid var(--border);
-  }
-  .pending-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
-    background: var(--pending-light);
-    border-bottom: 0.5px solid var(--border);
-  }
+  .pending-section { margin-bottom: 24px; border-radius: var(--radius-lg); overflow: hidden; border: 0.5px solid var(--border); }
+  .pending-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; background: var(--pending-light); border-bottom: 0.5px solid var(--border); }
   .pending-header h3 { margin: 0; color: var(--pending); text-transform: none; letter-spacing: 0; font-size: 13px; font-weight: 600; }
-
-  /* Inline result entry row */
-  .result-entry-row {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
+  .result-entry-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .result-entry-row input[type="number"] { width: 52px; padding: 5px 8px; font-size: 13px; }
   .result-entry-row .vs { color: var(--text-muted); font-size: 11px; }
   .result-entry-row button { margin: 0; padding: 5px 12px; font-size: 12px; }
-
-  /* Accordion */
-  .accordion-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    cursor: pointer;
-    user-select: none;
-    padding: 10px 14px;
-    background: var(--secondary-light);
-    border: 0.5px solid var(--border);
-    border-radius: var(--radius);
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--text);
-    transition: background 0.15s;
-  }
+  .accordion-header { display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; padding: 10px 14px; background: var(--secondary-light); border: 0.5px solid var(--border); border-radius: var(--radius); font-size: 13px; font-weight: 500; color: var(--text); transition: background 0.15s; }
   .accordion-header:hover { background: var(--border-light); }
   .accordion-header .chevron { font-size: 11px; transition: transform .2s; }
   .accordion-header.open .chevron { transform: rotate(180deg); }
   .accordion-body { display: none; border: 0.5px solid var(--border); border-top: none; border-radius: 0 0 var(--radius) var(--radius); }
   .accordion-body.open { display: block; }
-
-  /* Toggle */
-  .toggle-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin: 12px 0;
-    font-size: 13px;
-    color: var(--text-muted);
-    background: var(--secondary-light);
-    padding: 10px;
-    border-radius: var(--radius);
-  }
+  .toggle-row { display: flex; align-items: center; gap: 10px; margin: 12px 0; font-size: 13px; color: var(--text-muted); background: var(--secondary-light); padding: 10px; border-radius: var(--radius); }
   .toggle-switch { position: relative; display: inline-block; width: 36px; height: 20px; flex-shrink: 0; }
   .toggle-switch input { display: none; }
   .toggle-slider { position: absolute; inset: 0; background: #B4B2A9; border-radius: 20px; cursor: pointer; transition: 0.25s; }
   .toggle-slider::before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: 0.25s; }
   .toggle-switch input:checked + .toggle-slider { background: var(--primary-mid); }
   .toggle-switch input:checked + .toggle-slider::before { transform: translateX(16px); }
-
-  /* CSV Row */
-  .csv-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-wrap: wrap;
-    margin-top: 20px;
-    padding-top: 20px;
-    border-top: 0.5px solid var(--border-light);
-  }
+  .csv-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin-top: 20px; padding-top: 20px; border-top: 0.5px solid var(--border-light); }
   .csv-row input[type="file"] { font-size: 12px; flex: 1; min-width: 180px; border: none; padding: 0; }
   .csv-row button { flex-shrink: 0; }
   .csv-hint { font-size: 11px; color: var(--text-muted); margin-top: 6px; width: 100%; }
-
-  /* Eval */
   .eval-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 24px; }
   .eval-stat { background: var(--secondary-light); border: 0.5px solid var(--border); border-radius: var(--radius-lg); padding: 16px; text-align: center; }
   .eval-stat .val { font-size: 28px; font-weight: 500; color: var(--primary); line-height: 1.1; margin-bottom: 3px; }
   .eval-stat .lbl { font-size: 11px; color: var(--text-muted); }
-
   .cal-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; font-size: 12px; }
   .cal-bucket { width: 36px; text-align: right; color: var(--text-muted); font-weight: 600; flex-shrink: 0; }
   .cal-bar-wrap { flex: 1; position: relative; height: 18px; background: var(--border-light); border-radius: 3px; }
   .cal-bar-pred { position: absolute; top: 0; left: 0; height: 100%; background: var(--primary-light); border-radius: 3px; }
   .cal-bar-actual { position: absolute; top: 3px; left: 0; height: 12px; background: var(--primary-mid); border-radius: 3px; transition: width .35s; }
   .cal-meta { width: 110px; text-align: right; color: var(--text); flex-shrink: 0; font-size: 11px; }
-  .cal-gap-pos { color: var(--danger); font-weight: 600; }
-  .cal-gap-neg { color: var(--success); font-weight: 600; }
+  .cal-gap-pos { color: var(--danger); font-weight: 600; } .cal-gap-neg { color: var(--success); font-weight: 600; }
   .cal-n { width: 36px; text-align: right; color: #B4B2A9; flex-shrink: 0; font-size: 11px; }
-
-  /* Actions toolbar in history */
-  .history-toolbar {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 16px;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
+  .history-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; gap: 12px; flex-wrap: wrap; }
   .history-toolbar h2 { margin: 0; }
-
-  /* Inline score save feedback */
   .save-ok { color: var(--success); font-size: 11px; font-weight: 600; }
   .save-err { color: var(--danger); font-size: 11px; font-weight: 600; }
-
-  /* League table */
   #league-table-wrap { max-height: 360px; overflow-y: auto; }
+
+  /* FIX: Custom confirm dialog — avoids synchronous confirm() blocking the main thread */
+  .confirm-overlay {
+    display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+    z-index: 9999; align-items: center; justify-content: center;
+  }
+  .confirm-overlay.open { display: flex; }
+  .confirm-box {
+    background: var(--card-bg); border-radius: var(--radius-lg); padding: 24px 28px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.18); max-width: 380px; width: 90%;
+  }
+  .confirm-box p { font-size: 14px; margin-bottom: 20px; line-height: 1.5; color: var(--text); }
+  .confirm-box .confirm-actions { display: flex; gap: 10px; justify-content: flex-end; }
 
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-track { background: var(--border-light); }
@@ -394,6 +150,17 @@
 </style>
 </head>
 <body>
+
+<!-- FIX: Custom confirm dialog replaces synchronous window.confirm() -->
+<div class="confirm-overlay" id="confirm-overlay" role="dialog" aria-modal="true">
+  <div class="confirm-box">
+    <p id="confirm-msg"></p>
+    <div class="confirm-actions">
+      <button class="secondary" id="confirm-cancel">Cancel</button>
+      <button class="danger" id="confirm-ok">Delete</button>
+    </div>
+  </div>
+</div>
 
 <div class="app-header">
   <h1>Match Predictor</h1>
@@ -407,72 +174,34 @@
   <button class="page-tab" onclick="showPage('evaluate', this)">Evaluate</button>
 </div>
 
-
-<!-- ══════════════════════════════════════════
-     PAGE: MATCHES
-══════════════════════════════════════════ -->
+<!-- PAGE: MATCHES -->
 <div id="page-matches" class="page-panel active">
   <div class="layout">
-
     <div class="card">
       <h2>Add historical match</h2>
-
-      <div class="field">
-        <label>Date</label>
-        <input type="date" id="m-date">
-      </div>
-
+      <div class="field"><label>Date</label><input type="date" id="m-date"></div>
       <div class="team-swap-row">
-        <div>
-          <label>Home team</label>
-          <input type="text" id="m-home" list="team-suggestions" placeholder="e.g. Lazio" autocomplete="off">
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding-bottom:1px">
-          <span style="font-size:10px;color:var(--text-muted)">swap</span>
-          <button class="swap-btn" onclick="swapMatchTeams()" title="Swap home/away">⇄</button>
-        </div>
-        <div>
-          <label>Away team</label>
-          <input type="text" id="m-away" list="team-suggestions" placeholder="e.g. Napoli" autocomplete="off">
-        </div>
+        <div><label>Home team</label><input type="text" id="m-home" list="team-suggestions" placeholder="e.g. Lazio" autocomplete="off"></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding-bottom:1px"><span style="font-size:10px;color:var(--text-muted)">swap</span><button class="swap-btn" onclick="swapMatchTeams()" title="Swap home/away">⇄</button></div>
+        <div><label>Away team</label><input type="text" id="m-away" list="team-suggestions" placeholder="e.g. Napoli" autocomplete="off"></div>
       </div>
-
       <div class="row-2">
-        <div>
-          <label>Home score</label>
-          <input type="number" id="m-hs" min="0" value="0">
-        </div>
-        <div>
-          <label>Away score</label>
-          <input type="number" id="m-as" min="0" value="0">
-        </div>
+        <div><label>Home score</label><input type="number" id="m-hs" min="0" value="0"></div>
+        <div><label>Away score</label><input type="number" id="m-as" min="0" value="0"></div>
       </div>
-
       <div class="row-2">
-        <div>
-          <label>Home xG <span style="color:#B4B2A9">(optional)</span></label>
-          <input type="number" id="m-hxg" step="0.01" min="0" placeholder="—">
-        </div>
-        <div>
-          <label>Away xG <span style="color:#B4B2A9">(optional)</span></label>
-          <input type="number" id="m-axg" step="0.01" min="0" placeholder="—">
-        </div>
+        <div><label>Home xG <span style="color:#B4B2A9">(optional)</span></label><input type="number" id="m-hxg" step="0.01" min="0" placeholder="—"></div>
+        <div><label>Away xG <span style="color:#B4B2A9">(optional)</span></label><input type="number" id="m-axg" step="0.01" min="0" placeholder="—"></div>
       </div>
-
       <div class="toggle-row">
-        <label class="toggle-switch">
-          <input type="checkbox" id="reverse-fixture">
-          <span class="toggle-slider"></span>
-        </label>
+        <label class="toggle-switch"><input type="checkbox" id="reverse-fixture"><span class="toggle-slider"></span></label>
         <span>Also add reverse fixture (swap teams, invert score)</span>
       </div>
-
       <div style="display:flex;gap:8px;margin-top:4px">
         <button id="btn-add-match" onclick="addMatch()">Add match</button>
-        <button class="danger" onclick="resetAll()">Clear all</button>
+        <button class="danger" onclick="handleResetAll()">Clear all</button>
       </div>
       <div id="add-msg" class="msg"></div>
-
       <div class="csv-row">
         <input type="file" id="csv-file" accept=".csv">
         <button class="secondary" id="btn-upload-csv" onclick="uploadCSV()">Upload CSV</button>
@@ -480,7 +209,6 @@
       <div class="csv-hint">Columns: date, home_team, away_team, home_score, away_score, home_xg?, away_xg?</div>
       <div id="csv-msg" class="msg"></div>
     </div>
-
     <div>
       <div class="card" style="margin-bottom:16px">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -494,12 +222,8 @@
           </table>
         </div>
       </div>
-
       <div class="card" style="padding:14px">
-        <div class="accordion-header open" id="league-hdr" onclick="toggleLeague()">
-          <span>League table</span>
-          <span class="chevron">▼</span>
-        </div>
+        <div class="accordion-header open" id="league-hdr" onclick="toggleLeague()"><span>League table</span><span class="chevron">▼</span></div>
         <div class="accordion-body open" id="league-body">
           <div style="padding:10px 14px;border-bottom:0.5px solid var(--border-light);display:flex;gap:10px;align-items:center">
             <button class="secondary" style="margin:0;padding:5px 12px;font-size:12px" onclick="loadTable()">Refresh</button>
@@ -508,57 +232,39 @@
         </div>
       </div>
     </div>
-
   </div>
 </div>
 
-
-<!-- ══════════════════════════════════════════
-     PAGE: PREDICT
-══════════════════════════════════════════ -->
+<!-- PAGE: PREDICT -->
 <div id="page-predict" class="page-panel">
   <div class="layout">
-
-    <!-- Left: prediction form -->
     <div class="card">
       <h2>Predict a match</h2>
-
       <div class="team-swap-row">
-        <div>
-          <label>Home team</label>
-          <input type="text" id="p-home" list="team-suggestions" placeholder="Home team" autocomplete="off">
-        </div>
-        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding-bottom:1px">
-          <span style="font-size:10px;color:var(--text-muted)">swap</span>
-          <button class="swap-btn" onclick="swapPredictTeams()">⇄</button>
-        </div>
-        <div>
-          <label>Away team</label>
-          <input type="text" id="p-away" list="team-suggestions" placeholder="Away team" autocomplete="off">
-        </div>
+        <div><label>Home team</label><input type="text" id="p-home" list="team-suggestions" placeholder="Home team" autocomplete="off"></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:3px;padding-bottom:1px"><span style="font-size:10px;color:var(--text-muted)">swap</span><button class="swap-btn" onclick="swapPredictTeams()">⇄</button></div>
+        <div><label>Away team</label><input type="text" id="p-away" list="team-suggestions" placeholder="Away team" autocomplete="off"></div>
       </div>
-
       <div class="field">
         <label style="margin-bottom:8px">Decimal odds <span style="font-weight:400;color:#B4B2A9">(leave 0 to skip)</span></label>
         <div class="row-3">
-          <div>
-            <label>Home win</label>
-            <input type="number" id="p-oh" step="0.01" min="0" value="0">
-          </div>
-          <div>
-            <label>Draw</label>
-            <input type="number" id="p-od" step="0.01" min="0" value="0">
-          </div>
-          <div>
-            <label>Away win</label>
-            <input type="number" id="p-oa" step="0.01" min="0" value="0">
-          </div>
+          <div><label>Home win</label><input type="number" id="p-oh" step="0.01" min="0" value="0"></div>
+          <div><label>Draw</label><input type="number" id="p-od" step="0.01" min="0" value="0"></div>
+          <div><label>Away win</label><input type="number" id="p-oa" step="0.01" min="0" value="0"></div>
         </div>
       </div>
-
+      <div class="row-2">
+        <div class="field">
+          <label>Actionable Threshold <span style="font-weight:400;color:#B4B2A9">(min confidence)</span></label>
+          <input type="number" id="p-threshold" step="0.05" min="0" max="1" value="0.65">
+        </div>
+        <div class="field">
+          <label>Edge Threshold <span style="font-weight:400;color:#B4B2A9">(min edge over market)</span></label>
+          <input type="number" id="p-edge" step="0.01" min="0" max="1" value="0.0">
+        </div>
+      </div>
       <button id="btn-predict" onclick="runPrediction()">Run prediction</button>
       <div id="predict-msg" class="msg"></div>
-
       <div id="result-box">
         <div class="result-headline" id="r-headline"></div>
         <div class="result-sub">
@@ -566,7 +272,6 @@
           <span class="confidence-badge" id="r-confidence"></span>
           <span id="r-queued-note" style="font-size:11px;color:var(--pending);font-weight:600;display:none">↗ Added to fixtures queue</span>
         </div>
-
         <div class="prob-bar-wrap">
           <div class="prob-label"><span id="r-home-label">Home</span><span id="r-home-pct"></span></div>
           <div class="prob-bar-bg"><div class="prob-bar-fill home" id="r-home-bar"></div></div>
@@ -579,24 +284,19 @@
           <div class="prob-label"><span id="r-away-label">Away</span><span id="r-away-pct"></span></div>
           <div class="prob-bar-bg"><div class="prob-bar-fill away" id="r-away-bar"></div></div>
         </div>
-
         <table class="breakdown-table" style="margin-top:16px">
           <thead><tr><th>Source</th><th>Home</th><th>Draw</th><th>Away</th></tr></thead>
           <tbody id="r-breakdown-body"></tbody>
         </table>
       </div>
     </div>
-
-    <!-- Right: batch fixture builder -->
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
         <h2 style="margin:0">Fixture queue <span id="queue-count" style="font-weight:400;color:#B4B2A9;font-size:12px"></span></h2>
         <button class="ghost" onclick="showPage('history', document.getElementById('tab-history'))">View all →</button>
       </div>
       <p style="font-size:12px;color:var(--text-muted);margin-bottom:14px">Run predictions for each fixture. Results can be entered later from the Fixtures &amp; Results tab.</p>
-
       <div id="queue-empty" class="empty" style="padding:16px 0">No predictions run yet this session.</div>
-
       <div id="queue-list" style="display:none">
         <table>
           <thead><tr><th>Match</th><th>Prediction</th><th>Conf.</th><th></th></tr></thead>
@@ -604,14 +304,10 @@
         </table>
       </div>
     </div>
-
   </div>
 </div>
 
-
-<!-- ══════════════════════════════════════════
-     PAGE: FIXTURES & RESULTS (HISTORY)
-══════════════════════════════════════════ -->
+<!-- PAGE: FIXTURES & RESULTS -->
 <div id="page-history" class="page-panel">
   <div style="max-width:1100px">
     <div class="card">
@@ -620,15 +316,11 @@
         <div style="display:flex;gap:8px;align-items:center">
           <label style="margin:0;font-size:12px;color:var(--text-muted)">Show:</label>
           <select id="history-filter" onchange="loadHistory()" style="width:auto;padding:5px 10px;font-size:12px">
-            <option value="all">All</option>
-            <option value="pending">Pending only</option>
-            <option value="evaluated">Evaluated only</option>
+            <option value="all">All</option><option value="pending">Pending only</option><option value="evaluated">Evaluated only</option>
           </select>
           <button class="secondary" style="padding:5px 12px;font-size:12px" onclick="loadHistory()">Refresh</button>
         </div>
       </div>
-
-      <!-- Pending batch entry section -->
       <div id="pending-section" style="display:none" class="pending-section">
         <div class="pending-header">
           <h3 id="pending-count-label">Awaiting results</h3>
@@ -636,25 +328,21 @@
         </div>
         <div id="pending-rows"></div>
       </div>
-
-      <!-- Full history table -->
-      <div id="pred-table-wrap">
-        <div class="empty">No predictions recorded yet. Run a prediction first.</div>
-      </div>
+      <div id="pred-table-wrap"><div class="empty">No predictions recorded yet. Run a prediction first.</div></div>
     </div>
   </div>
 </div>
 
-
-<!-- ══════════════════════════════════════════
-     PAGE: EVALUATE
-══════════════════════════════════════════ -->
+<!-- PAGE: EVALUATE -->
 <div id="page-evaluate" class="page-panel">
   <div style="max-width:760px">
     <div class="card">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px">
         <h2 style="margin:0">Model evaluation</h2>
-        <button id="btn-evaluate" onclick="runEvaluate()" style="padding:6px 14px;font-size:12px">Run evaluation</button>
+        <div>
+          <button id="btn-calibrate" onclick="runCalibrate()" style="padding:6px 14px;font-size:12px;margin-right:8px">Calibrate Model</button>
+          <button id="btn-evaluate" onclick="runEvaluate()" style="padding:6px 14px;font-size:12px">Run evaluation</button>
+        </div>
       </div>
       <div id="eval-empty" class="empty">Record actual results on predictions first, then click Run Evaluation.</div>
       <div id="eval-results" style="display:none">
@@ -678,50 +366,104 @@
 <script>
 const API = '';
 let _lastPredictionId = null;
-let _queuedPredictions = [];  // [{id, home, away, prediction, confidence}]
+let _queuedPredictions = [];
 
-// ── utilities ──────────────────────────────────────────────────────────────
+// ─────────────────────────────────────────────────────────────────────
+//  FIX 1: Async confirm dialog — replaces synchronous window.confirm()
+//  which blocks the main thread and spikes INP on pointer interactions.
+// ─────────────────────────────────────────────────────────────────────
+function asyncConfirm(message) {
+  return new Promise(resolve => {
+    const overlay = document.getElementById('confirm-overlay');
+    document.getElementById('confirm-msg').textContent = message;
+    overlay.classList.add('open');
 
-function msg(id, text, ok) {
-  const el = document.getElementById(id);
-  if (!el) return;
-  el.textContent = text;
-  el.className = 'msg ' + (ok ? 'ok' : 'err');
-  el.style.display = text ? 'block' : 'none';
-  if (ok && text) setTimeout(() => { if (el.textContent === text) { el.textContent = ''; el.style.display = 'none'; } }, 3500);
+    function cleanup(result) {
+      overlay.classList.remove('open');
+      document.getElementById('confirm-ok').removeEventListener('click', onOk);
+      document.getElementById('confirm-cancel').removeEventListener('click', onCancel);
+      overlay.removeEventListener('click', onOverlay);
+      resolve(result);
+    }
+    const onOk      = () => cleanup(true);
+    const onCancel  = () => cleanup(false);
+    const onOverlay = (e) => { if (e.target === overlay) cleanup(false); };
+
+    document.getElementById('confirm-ok').addEventListener('click', onOk);
+    document.getElementById('confirm-cancel').addEventListener('click', onCancel);
+    overlay.addEventListener('click', onOverlay);
+  });
 }
 
+// ─── Helper: creates a <tr> for a match ──────────────────────────────
+function createMatchRowElement(date, home, away, homeScore, awayScore) {
+  const tr = document.createElement('tr');
+  tr.dataset.isoDate = date;
+  // FIX 2: Store identifying data as data-attributes so the delete
+  // handler can do a targeted DOM removal without a full list reload.
+  tr.dataset.home = home;
+  tr.dataset.away = away;
+  tr.innerHTML = `
+    <td>${fmtDate(date)}</td>
+    <td>${esc(home)}</td>
+    <td style="font-variant-numeric:tabular-nums;font-weight:600">${homeScore} – ${awayScore}</td>
+    <td>${esc(away)}</td>
+    <td><button class="secondary" data-action="delete-match" title="Delete">✕</button></td>
+  `;
+  return tr;
+}
+
+// ─── Helper: inserts a row in correct descending-date order ──────────
+function insertMatchRowSorted(tr, isoDate) {
+  const tbody = document.getElementById('match-tbody');
+  const rows = tbody.children;
+  let inserted = false;
+  for (let i = 0; i < rows.length; i++) {
+    const rowDate = rows[i].dataset.isoDate;
+    if (rowDate && isoDate > rowDate) {
+      tbody.insertBefore(tr, rows[i]);
+      inserted = true;
+      break;
+    }
+  }
+  if (!inserted) tbody.appendChild(tr);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+//  FIX 3: Single delegated click listener on match tbody.
+//  Replaces per-row inline onclick handlers which each capture a
+//  closure and inflate memory for large tables.
+// ─────────────────────────────────────────────────────────────────────
+document.addEventListener('DOMContentLoaded', () => {
+  document.getElementById('match-tbody').addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-action="delete-match"]');
+    if (!btn) return;
+    const tr = btn.closest('tr');
+    if (!tr) return;
+    const date = tr.dataset.isoDate;
+    const home = tr.dataset.home;
+    const away = tr.dataset.away;
+    await deleteMatch(date, home, away, tr);
+  });
+});
+
+function msg(id, text, ok) {
+  const el = document.getElementById(id); if (!el) return;
+  el.textContent = text; el.className = 'msg ' + (ok ? 'ok' : 'err'); el.style.display = text ? 'block' : 'none';
+  if (ok && text) setTimeout(() => { if (el.textContent === text) { el.textContent = ''; el.style.display = 'none'; } }, 3500);
+}
 function setLoading(btnId, loading) {
-  const btn = document.getElementById(btnId);
-  if (!btn) return;
+  const btn = document.getElementById(btnId); if (!btn) return;
   if (loading) { btn.dataset.orig = btn.textContent; btn.textContent = 'Working…'; btn.disabled = true; }
   else { btn.textContent = btn.dataset.orig || 'Submit'; btn.disabled = false; }
 }
-
-function esc(s) {
-  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-
-function fmtDate(iso) {
-  if (!iso) return '';
-  const [y, m, d] = iso.split('T')[0].split('-');
-  return `${parseInt(d)} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]} ${y}`;
-}
-function fmtDateTime(iso) {
-  if (!iso) return '';
-  const [datePart, tp = ''] = iso.split('T');
-  return fmtDate(datePart) + (tp ? ' ' + tp.slice(0,5) : '');
-}
-
+function esc(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(iso) { if (!iso) return ''; const [y, m, d] = iso.split('T')[0].split('-'); return `${parseInt(d)} ${['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][parseInt(m)-1]} ${y}`; }
+function fmtDateTime(iso) { if (!iso) return ''; const [datePart, tp = ''] = iso.split('T'); return fmtDate(datePart) + (tp ? ' ' + tp.slice(0,5) : ''); }
 function updatePendingBadge(count) {
-  const b = document.getElementById('pending-badge');
-  b.textContent = count > 0 ? count : '';
-  const qc = document.getElementById('queue-count');
-  if (qc) qc.textContent = _queuedPredictions.length > 0 ? `(${_queuedPredictions.length})` : '';
+  const b = document.getElementById('pending-badge'); b.textContent = count > 0 ? count : '';
+  const qc = document.getElementById('queue-count'); if (qc) qc.textContent = _queuedPredictions.length > 0 ? `(${_queuedPredictions.length})` : '';
 }
-
-// ── page tabs ──────────────────────────────────────────────────────────────
-
 function showPage(name, el) {
   document.querySelectorAll('.page-panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.page-tab').forEach(b => b.classList.remove('active'));
@@ -730,37 +472,22 @@ function showPage(name, el) {
   if (name === 'history') loadHistory();
   if (name === 'evaluate') runEvaluate();
 }
-
-// ── team autocomplete ──────────────────────────────────────────────────────
-
 async function refreshTeamList() {
   try {
     const teams = await fetch(`${API}/teams`).then(r => r.json());
-    const dl = document.getElementById('team-suggestions');
-    dl.innerHTML = '';
+    const dl = document.getElementById('team-suggestions'); dl.innerHTML = '';
     teams.forEach(t => { const o = document.createElement('option'); o.value = t; dl.appendChild(o); });
   } catch(_) {}
 }
-
-// ── swap ──────────────────────────────────────────────────────────────────
-
 function swapMatchTeams() {
   const [h, a, hs, as_, hxg, axg] = ['m-home','m-away','m-hs','m-as','m-hxg','m-axg'].map(id => document.getElementById(id));
-  [h.value, a.value] = [a.value, h.value];
-  [hs.value, as_.value] = [as_.value, hs.value];
-  [hxg.value, axg.value] = [axg.value, hxg.value];
+  [h.value, a.value] = [a.value, h.value]; [hs.value, as_.value] = [as_.value, hs.value]; [hxg.value, axg.value] = [axg.value, hxg.value];
 }
-
 function swapPredictTeams() {
   const [h, a, oh, oa] = ['p-home','p-away','p-oh','p-oa'].map(id => document.getElementById(id));
-  [h.value, a.value] = [a.value, h.value];
-  [oh.value, oa.value] = [oa.value, oh.value];
-  document.getElementById('result-box').style.display = 'none';
-  _lastPredictionId = null;
+  [h.value, a.value] = [a.value, h.value]; [oh.value, oa.value] = [oa.value, oh.value];
+  document.getElementById('result-box').style.display = 'none'; _lastPredictionId = null;
 }
-
-// ── add match ──────────────────────────────────────────────────────────────
-
 async function addMatch() {
   const d = document.getElementById('m-date').value;
   const home = document.getElementById('m-home').value.trim();
@@ -778,44 +505,72 @@ async function addMatch() {
     const body = { date: d, home_team: h, away_team: a, home_score: hscore, away_score: ascore };
     if (hx !== '') body.home_xg = parseFloat(hx);
     if (ax !== '') body.away_xg = parseFloat(ax);
-    return fetch(`${API}/matches`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify(body) }).then(r => r.json());
+    return fetch(`${API}/matches`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }).then(r => r.json());
   };
 
   setLoading('btn-add-match', true);
   try {
     const data = await post(home, away, hs, as_, hxg, axg);
-    if (!data.added) { msg('add-msg', 'Match already exists (duplicate).', false); return; }
-    if (doRev) await post(away, home, as_, hs, axg, hxg);
-    msg('add-msg', `Added. Total: ${data.total} match${data.total !== 1 ? 'es' : ''}.`, true);
-    ['m-hs','m-as','m-hxg','m-axg'].forEach(id => document.getElementById(id).value = id.includes('xg') ? '' : 0);
-    await loadMatches();
+    if (!data.added) { msg('add-msg', 'Match already exists (duplicate).', false); setLoading('btn-add-match', false); return; }
+
+    const tr = createMatchRowElement(d, home, away, hs, as_);
+    insertMatchRowSorted(tr, d);
+
+    let totalMatches = data.total;
+    if (doRev) {
+      const revData = await post(away, home, as_, hs, axg, hxg);
+      if (revData.added) {
+        const revTr = createMatchRowElement(d, away, home, as_, hs);
+        insertMatchRowSorted(revTr, d);
+        totalMatches = revData.total;
+      } else {
+        console.warn('Reverse fixture not added (duplicate).');
+      }
+    }
+
+    document.getElementById('match-table').style.display = 'table';
+    document.getElementById('match-list-empty').style.display = 'none';
+    document.getElementById('match-count').textContent = `(${totalMatches})`;
+    ['m-hs', 'm-as', 'm-hxg', 'm-axg'].forEach(id => { document.getElementById(id).value = id.includes('xg') ? '' : 0; });
+    msg('add-msg', `Added. Total: ${totalMatches} match${totalMatches !== 1 ? 'es' : ''}.`, true);
     await refreshTeamList();
-  } catch(_) { msg('add-msg', 'Network error.', false); }
+  } catch (_) { msg('add-msg', 'Network error.', false); }
   setLoading('btn-add-match', false);
 }
-
-// ── CSV upload ─────────────────────────────────────────────────────────────
 
 async function uploadCSV() {
   const fi = document.getElementById('csv-file');
   const file = fi.files[0];
   if (!file) { msg('csv-msg', 'Please select a CSV file.', false); return; }
-  const fd = new FormData(); fd.append('file', file);
+  const fd = new FormData();
+  fd.append('file', file);
   setLoading('btn-upload-csv', true);
   try {
     const res = await fetch(`${API}/upload-csv`, { method: 'POST', body: fd });
     const data = await res.json();
     if (!res.ok) { msg('csv-msg', data.detail || 'Upload failed.', false); return; }
+
     let text = `Uploaded: ${data.added} new match${data.added !== 1 ? 'es' : ''}. Total: ${data.total}.`;
     if (data.errors?.length) text += ` Warnings: ${data.errors.join('; ')}`;
     msg('csv-msg', text, true);
     fi.value = '';
-    await loadMatches(); await refreshTeamList();
-  } catch(_) { msg('csv-msg', 'Network error.', false); }
+
+    const addedMatches = data.added_matches || [];
+    if (addedMatches.length) {
+      document.getElementById('match-table').style.display = 'table';
+      document.getElementById('match-list-empty').style.display = 'none';
+      addedMatches.forEach(m => {
+        const tr = createMatchRowElement(m.match_date, m.home_team, m.away_team, m.home_score, m.away_score);
+        insertMatchRowSorted(tr, m.match_date);
+      });
+      document.getElementById('match-count').textContent = `(${data.total})`;
+    } else if (data.total !== undefined) {
+      document.getElementById('match-count').textContent = `(${data.total})`;
+    }
+    await refreshTeamList();
+  } catch (_) { msg('csv-msg', 'Network error.', false); }
   setLoading('btn-upload-csv', false);
 }
-
-// ── load matches ───────────────────────────────────────────────────────────
 
 async function loadMatches() {
   try {
@@ -824,46 +579,103 @@ async function loadMatches() {
     const table = document.getElementById('match-table');
     const empty = document.getElementById('match-list-empty');
     const count = document.getElementById('match-count');
+
+    if (!matches.length) {
+      table.style.display = 'none'; empty.style.display = 'block'; count.textContent = '';
+      return;
+    }
+    table.style.display = 'table'; empty.style.display = 'none'; count.textContent = `(${matches.length})`;
     tbody.innerHTML = '';
-    if (!matches.length) { table.style.display = 'none'; empty.style.display = 'block'; count.textContent = ''; return; }
-    table.style.display = 'table'; empty.style.display = 'none';
-    count.textContent = `(${matches.length})`;
-    matches.forEach(m => {
-      const tr = document.createElement('tr');
-      tr.innerHTML = `<td>${fmtDate(m.match_date)}</td><td>${esc(m.home_team)}</td>
-        <td style="font-variant-numeric:tabular-nums;font-weight:600">${m.home_score} – ${m.away_score}</td>
-        <td>${esc(m.away_team)}</td>
-        <td><button class="secondary" onclick="deleteMatch('${esc(m.match_date)}','${esc(m.home_team)}','${esc(m.away_team)}')" title="Delete">✕</button></td>`;
-      tbody.appendChild(tr);
-    });
+
+    // FIX 4: Reduced chunk size from 50→20 so the first paint unblocks
+    // the main thread faster, keeping individual tasks well under 50ms.
+    const chunkSize = 20;
+    let index = 0;
+
+    function renderChunk() {
+      const fragment = document.createDocumentFragment();
+      const end = Math.min(index + chunkSize, matches.length);
+      for (let i = index; i < end; i++) {
+        const m = matches[i];
+        // FIX 5: Store home/away on dataset so the delegated delete
+        // handler can read them without parsing innerHTML.
+        const tr = document.createElement('tr');
+        tr.dataset.isoDate = m.match_date;
+        tr.dataset.home    = m.home_team;
+        tr.dataset.away    = m.away_team;
+        tr.innerHTML = `
+          <td>${fmtDate(m.match_date)}</td>
+          <td>${esc(m.home_team)}</td>
+          <td style="font-variant-numeric:tabular-nums;font-weight:600">${m.home_score} – ${m.away_score}</td>
+          <td>${esc(m.away_team)}</td>
+          <td><button class="secondary" data-action="delete-match" title="Delete">✕</button></td>`;
+        fragment.appendChild(tr);
+      }
+      tbody.appendChild(fragment);
+      index = end;
+      if (index < matches.length) setTimeout(renderChunk, 0);
+    }
+    renderChunk();
   } catch(_) {}
 }
 
-// ── delete match ───────────────────────────────────────────────────────────
-
-async function deleteMatch(date, home, away) {
-  if (!confirm(`Delete: ${home} vs ${away} (${date})?`)) return;
+// ─────────────────────────────────────────────────────────────────────
+//  FIX 6: deleteMatch — targeted DOM removal instead of full reload.
+//  Accepts the <tr> element directly from the delegated listener.
+//  No more loadMatches() call on delete → no 1000-row re-render spike.
+// ─────────────────────────────────────────────────────────────────────
+async function deleteMatch(date, home, away, trEl) {
+  const confirmed = await asyncConfirm(`Delete: ${home} vs ${away} (${date})?`);
+  if (!confirmed) return;
   try {
-    const res = await fetch(`${API}/matches`, { method: 'DELETE', headers: {'Content-Type':'application/json'}, body: JSON.stringify({date, home_team: home, away_team: away}) });
-    if (!res.ok) { const d = await res.json(); alert(d.detail || 'Could not delete.'); return; }
-    await loadMatches(); await refreshTeamList();
+    const res = await fetch(`${API}/matches`, {
+      method: 'DELETE',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({ date, home_team: home, away_team: away })
+    });
+    if (!res.ok) {
+      const d = await res.json();
+      alert(d.detail || 'Could not delete.');
+      return;
+    }
+    const data = await res.json();
+
+    // Remove only the affected row — O(1) DOM op instead of O(n) re-render
+    if (trEl) {
+      trEl.remove();
+    }
+
+    // Update count from server response
+    const countEl = document.getElementById('match-count');
+    const remaining = data.total ?? 0;
+    countEl.textContent = remaining > 0 ? `(${remaining})` : '';
+
+    // Hide table if no rows left
+    const tbody = document.getElementById('match-tbody');
+    if (!tbody.children.length) {
+      document.getElementById('match-table').style.display = 'none';
+      document.getElementById('match-list-empty').style.display = 'block';
+    }
+
+    await refreshTeamList();
   } catch(_) { alert('Network error.'); }
 }
 
-// ── reset ──────────────────────────────────────────────────────────────────
-
-async function resetAll() {
-  if (!confirm('Clear ALL match data? This cannot be undone.')) return;
+// ─────────────────────────────────────────────────────────────────────
+//  FIX 7: handleResetAll — uses asyncConfirm instead of confirm()
+// ─────────────────────────────────────────────────────────────────────
+async function handleResetAll() {
+  const confirmed = await asyncConfirm('Clear ALL match data? This cannot be undone.');
+  if (!confirmed) return;
   try {
     await fetch(`${API}/reset`, { method: 'DELETE' });
-    await loadMatches(); await refreshTeamList();
+    await loadMatches();
+    await refreshTeamList();
     document.getElementById('league-table-wrap').innerHTML = '<div class="empty">Add matches and click Refresh.</div>';
     document.getElementById('result-box').style.display = 'none';
     _lastPredictionId = null;
   } catch(_) {}
 }
-
-// ── predict ────────────────────────────────────────────────────────────────
 
 async function runPrediction() {
   const home = document.getElementById('p-home').value.trim();
@@ -871,13 +683,18 @@ async function runPrediction() {
   const oh = parseFloat(document.getElementById('p-oh').value) || 0;
   const od = parseFloat(document.getElementById('p-od').value) || 0;
   const oa = parseFloat(document.getElementById('p-oa').value) || 0;
+  const threshold = parseFloat(document.getElementById('p-threshold').value) || 0.65;
+  const edge = parseFloat(document.getElementById('p-edge').value) || 0.0;
 
   if (!home || !away) { msg('predict-msg', 'Enter both team names.', false); return; }
   if (home.toLowerCase() === away.toLowerCase()) { msg('predict-msg', 'Teams must be different.', false); return; }
 
   setLoading('btn-predict', true);
   try {
-    const res = await fetch(`${API}/predict`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ home_team: home, away_team: away, odds_h: oh, odds_d: od, odds_a: oa }) });
+    const res = await fetch(`${API}/predict?threshold=${threshold}&edge_threshold=${edge}`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ home_team: home, away_team: away, odds_h: oh, odds_d: od, odds_a: oa })
+    });
     const data = await res.json();
     if (!res.ok) { msg('predict-msg', data.detail || 'Prediction failed.', false); return; }
 
@@ -885,18 +702,13 @@ async function runPrediction() {
     msg('predict-msg', '', true);
     renderResult(data);
 
-    // Add to session queue
     const already = _queuedPredictions.find(p => p.id === data.prediction_id);
     if (!already) {
       _queuedPredictions.unshift({ id: data.prediction_id, home: data.home_team, away: data.away_team, prediction: data.prediction, confidence: data.confidence });
       renderQueue();
     }
-
-    // Show "queued" note
     document.getElementById('r-queued-note').style.display = 'inline';
     setTimeout(() => { document.getElementById('r-queued-note').style.display = 'none'; }, 3000);
-
-    // Refresh pending badge
     refreshPendingCount();
   } catch(_) { msg('predict-msg', 'Network error.', false); }
   setLoading('btn-predict', false);
@@ -906,7 +718,13 @@ function renderResult(d) {
   document.getElementById('result-box').style.display = 'block';
   document.getElementById('r-headline').textContent = `${d.home_team}  vs  ${d.away_team}`;
   document.getElementById('r-prediction-label').textContent = `Prediction: ${d.prediction}`;
-  document.getElementById('r-confidence').textContent = `${d.confidence}% confidence`;
+
+  const actionableBadge = d.actionable
+    ? `<span class="badge correct" style="margin-left:8px">ACTIONABLE</span>`
+    : `<span class="badge wrong" style="margin-left:8px">NOT ACTIONABLE</span>`;
+  document.getElementById('r-confidence').innerHTML =
+    `${d.confidence}% confidence &nbsp;|&nbsp; Max Prob: ${d.max_probability}% ${actionableBadge}`;
+
   document.getElementById('r-home-label').textContent = d.home_team;
   document.getElementById('r-away-label').textContent = d.away_team;
   document.getElementById('r-home-pct').textContent = d.probabilities.home + '%';
@@ -921,7 +739,7 @@ function renderResult(d) {
   ab.style.width = d.probabilities.away + '%';
   [hb, db, ab].forEach(b => b.classList.remove('winner'));
   if (d.prediction === 'Home Win') hb.classList.add('winner');
-  if (d.prediction === 'Draw') db.classList.add('winner');
+  if (d.prediction === 'Draw')     db.classList.add('winner');
   if (d.prediction === 'Away Win') ab.classList.add('winner');
 
   const tbody = document.getElementById('r-breakdown-body');
@@ -932,25 +750,19 @@ function renderResult(d) {
     tr.innerHTML = `<td>${srcLabels[src] || src}</td><td>${p.home}%</td><td>${p.draw}%</td><td>${p.away}%</td>`;
     tbody.appendChild(tr);
   }
-  const cr = document.createElement('tr'); cr.className = 'combined-row';
+  const cr = document.createElement('tr');
+  cr.className = 'combined-row';
   cr.innerHTML = `<td>Combined</td><td>${d.probabilities.home}%</td><td>${d.probabilities.draw}%</td><td>${d.probabilities.away}%</td>`;
   tbody.appendChild(cr);
 }
 
-// ── session queue ──────────────────────────────────────────────────────────
-
 function renderQueue() {
-  const empty = document.getElementById('queue-empty');
-  const list = document.getElementById('queue-list');
-  const tbody = document.getElementById('queue-tbody');
-  const qc = document.getElementById('queue-count');
-
-  if (!_queuedPredictions.length) {
-    empty.style.display = 'block'; list.style.display = 'none';
-    qc.textContent = ''; return;
-  }
-  empty.style.display = 'none'; list.style.display = 'block';
-  qc.textContent = `(${_queuedPredictions.length})`;
+  const empty  = document.getElementById('queue-empty');
+  const list   = document.getElementById('queue-list');
+  const tbody  = document.getElementById('queue-tbody');
+  const qc     = document.getElementById('queue-count');
+  if (!_queuedPredictions.length) { empty.style.display = 'block'; list.style.display = 'none'; qc.textContent = ''; return; }
+  empty.style.display = 'none'; list.style.display = 'block'; qc.textContent = `(${_queuedPredictions.length})`;
   tbody.innerHTML = '';
   _queuedPredictions.forEach(p => {
     const tr = document.createElement('tr');
@@ -965,48 +777,52 @@ function renderQueue() {
 
 function prefillResult(predId, home, away) {
   showPage('history', document.getElementById('tab-history'));
-  // Small delay to let the tab render
   setTimeout(() => {
     const row = document.getElementById(`pending-row-${predId}`);
     if (row) { row.scrollIntoView({ behavior: 'smooth', block: 'center' }); row.style.background = '#EEEDFE'; setTimeout(() => row.style.background = '', 1200); }
   }, 200);
 }
 
-// ── pending count badge ─────────────────────────────────────────────────────
-
 async function refreshPendingCount() {
   try {
-    const rows = await fetch(`${API}/predictions/history?limit=200`).then(r => r.json());
-    const pending = rows.filter(r => !r.outcome).length;
-    updatePendingBadge(pending);
-  } catch(_) {}
+    const res  = await fetch(`${API}/predictions/history?page=1&limit=1&outcome=pending`);
+    const data = await res.json();
+    const pendingCount = data.total || 0;
+    updatePendingBadge(pendingCount);
+    return pendingCount;
+  } catch (_) { updatePendingBadge(0); return 0; }
 }
 
-// ── history / fixtures ─────────────────────────────────────────────────────
+let historyState = { page: 1, limit: 20, filter: 'all', total: 0, pages: 1, rows: [] };
+
+function goToPage(p) {
+  historyState.page = p;
+  loadHistory();
+}
 
 async function loadHistory() {
   try {
     const filter = document.getElementById('history-filter').value;
-    const rows = await fetch(`${API}/predictions/history?limit=200`).then(r => r.json());
+    const page   = historyState.page;
+    const limit  = historyState.limit;
+    const url    = `${API}/predictions/history?page=${page}&limit=${limit}&outcome=${filter}`;
+    const res    = await fetch(url);
+    const data   = await res.json();
 
-    // Separate pending vs evaluated
-    const pending = rows.filter(r => !r.outcome);
-    const evaluated = rows.filter(r => r.outcome);
+    historyState.total = data.total;
+    historyState.pages = data.pages;
+    historyState.rows  = data.items;
 
-    updatePendingBadge(pending.length);
-
-    // Build pending batch section
-    const ps = document.getElementById('pending-section');
-    const pr = document.getElementById('pending-rows');
+    const pending = data.items.filter(r => !r.outcome);
+    const ps  = document.getElementById('pending-section');
+    const pr  = document.getElementById('pending-rows');
     const pcl = document.getElementById('pending-count-label');
 
     if (pending.length > 0 && filter !== 'evaluated') {
       ps.style.display = 'block';
-      pcl.textContent = `${pending.length} fixture${pending.length !== 1 ? 's' : ''} awaiting results`;
+      pcl.textContent = `${pending.length} fixture${pending.length !== 1 ? 's' : ''} awaiting results (page ${page})`;
       pr.innerHTML = '';
       pending.forEach(p => {
-        const predLabels = { H: 'Home Win', D: 'Draw', A: 'Away Win' };
-        const predShort = p.prediction;
         const div = document.createElement('div');
         div.id = `pending-row-${p.id}`;
         div.style.cssText = 'padding:10px 16px;border-bottom:0.5px solid var(--border-light);display:flex;align-items:center;gap:12px;flex-wrap:wrap;transition:background 0.3s';
@@ -1018,7 +834,7 @@ async function loadHistory() {
             <span style="display:block;font-size:11px;color:var(--text-muted);margin-top:2px">${fmtDateTime(p.created_at)}</span>
           </div>
           <div style="display:flex;align-items:center;gap:6px">
-            <span class="badge pending">${predShort}</span>
+            <span class="badge pending">${p.prediction}</span>
             <span style="font-size:11px;color:var(--text-muted)">${p.confidence}%</span>
           </div>
           <div class="result-entry-row" id="entry-${p.id}">
@@ -1035,88 +851,106 @@ async function loadHistory() {
       ps.style.display = 'none';
     }
 
-    // Build full history table
     const wrap = document.getElementById('pred-table-wrap');
-    let displayRows = rows;
-    if (filter === 'pending') displayRows = pending;
-    if (filter === 'evaluated') displayRows = evaluated;
-
-    if (!displayRows.length) {
+    if (!data.items.length) {
       wrap.innerHTML = `<div class="empty">${filter === 'pending' ? 'No pending fixtures — all results entered.' : filter === 'evaluated' ? 'No evaluated predictions yet.' : 'No predictions recorded yet.'}</div>`;
       return;
     }
 
-    let html = `<table><thead><tr>
-      <th>#</th><th>When</th><th>Match</th>
-      <th>Prediction</th><th>Conf.</th>
-      <th>H%</th><th>D%</th><th>A%</th>
-      <th>Score</th><th>Outcome</th>
-    </tr></thead><tbody>`;
+    wrap.innerHTML = `
+      <table>
+        <thead>
+          <tr>
+            <th>#</th><th>When</th><th>Match</th><th>Prediction</th>
+            <th>Conf.</th><th>H%</th><th>D%</th><th>A%</th>
+            <th>Score</th><th>Outcome</th>
+          </tr>
+        </thead>
+        <tbody id="history-tbody"></tbody>
+      </table>
+      <div id="pagination-controls" style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;gap:8px;flex-wrap:wrap;">
+        <button class="secondary" onclick="goToPage(${page - 1})" ${page <= 1 ? 'disabled' : ''}>◀ Previous</button>
+        <span style="font-size:13px;color:var(--text-muted)">Page ${page} of ${data.pages} (${data.total} total)</span>
+        <button class="secondary" onclick="goToPage(${page + 1})" ${page >= data.pages ? 'disabled' : ''}>Next ▶</button>
+      </div>`;
 
-    displayRows.forEach(r => {
-      const pred = r.prediction;
-      let resultCell = '—';
-      if (r.actual_home_score !== null && r.actual_away_score !== null) resultCell = `${r.actual_home_score} – ${r.actual_away_score}`;
-      let outcomeBadge = '<span class="badge pending">Pending</span>';
-      if (r.outcome) {
-        const predLabels = { H: 'Home Win', D: 'Draw', A: 'Away Win' };
-        outcomeBadge = `<span class="badge ${r.is_correct ? 'correct' : 'wrong'}">${predLabels[r.outcome] || r.outcome}</span>`;
+    // FIX 8: Reduced chunk size from 20→10 in history table for even
+    // finer-grained yielding; history rows are heavier HTML than match rows.
+    const tbody    = document.getElementById('history-tbody');
+    const rows     = data.items;
+    const chunkSize = 10;
+    let index = 0;
+
+    function renderChunk() {
+      const fragment = document.createDocumentFragment();
+      const end = Math.min(index + chunkSize, rows.length);
+      for (let i = index; i < end; i++) {
+        const r = rows[i];
+        let resultCell = '—';
+        if (r.actual_home_score !== null && r.actual_away_score !== null)
+          resultCell = `${r.actual_home_score} – ${r.actual_away_score}`;
+        let outcomeBadge = '<span class="badge pending">Pending</span>';
+        if (r.outcome) {
+          const predLabels = { H: 'Home Win', D: 'Draw', A: 'Away Win' };
+          const label = predLabels[r.outcome] || r.outcome;
+          outcomeBadge = `<span class="badge ${r.is_correct ? 'correct' : 'wrong'}">${label}</span>`;
+        }
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td style="color:#B4B2A9;font-size:11px">${r.id}</td>
+          <td style="white-space:nowrap;font-size:11px;color:var(--text-muted)">${fmtDateTime(r.created_at)}</td>
+          <td style="white-space:nowrap;font-weight:500;font-size:12px">${esc(r.home_team)} <span style="color:var(--text-muted);font-weight:400">vs</span> ${esc(r.away_team)}</td>
+          <td style="font-size:12px">${r.prediction}</td>
+          <td style="font-size:12px">${r.confidence}%</td>
+          <td style="font-size:12px">${r.prob_home}%</td>
+          <td style="font-size:12px">${r.prob_draw}%</td>
+          <td style="font-size:12px">${r.prob_away}%</td>
+          <td style="font-variant-numeric:tabular-nums;font-size:12px">${resultCell}</td>
+          <td>${outcomeBadge}</td>`;
+        fragment.appendChild(tr);
       }
-      html += `<tr>
-        <td style="color:#B4B2A9;font-size:11px">${r.id}</td>
-        <td style="white-space:nowrap;font-size:11px;color:var(--text-muted)">${fmtDateTime(r.created_at)}</td>
-        <td style="white-space:nowrap;font-weight:500;font-size:12px">${esc(r.home_team)} <span style="color:var(--text-muted);font-weight:400">vs</span> ${esc(r.away_team)}</td>
-        <td style="font-size:12px">${pred}</td>
-        <td style="font-size:12px">${r.confidence}%</td>
-        <td style="font-size:12px">${r.prob_home}%</td>
-        <td style="font-size:12px">${r.prob_draw}%</td>
-        <td style="font-size:12px">${r.prob_away}%</td>
-        <td style="font-variant-numeric:tabular-nums;font-size:12px">${resultCell}</td>
-        <td>${outcomeBadge}</td>
-      </tr>`;
-    });
-    html += '</tbody></table>';
-    wrap.innerHTML = html;
-  } catch(_) {}
+      tbody.appendChild(fragment);
+      index = end;
+      if (index < rows.length) setTimeout(renderChunk, 0);
+    }
+    renderChunk();
+
+    refreshPendingCount();
+  } catch (_) {}
 }
 
-// ── save result (from history inline form) ─────────────────────────────────
-
 async function saveResult(predId) {
-  const hInput = document.getElementById(`rr-h-${predId}`);
-  const aInput = document.getElementById(`rr-a-${predId}`);
+  const hInput   = document.getElementById(`rr-h-${predId}`);
+  const aInput   = document.getElementById(`rr-a-${predId}`);
   const statusEl = document.getElementById(`entry-msg-${predId}`);
-  const hs = parseInt(hInput.value);
+  const hs  = parseInt(hInput.value);
   const as_ = parseInt(aInput.value);
-
   if (isNaN(hs) || isNaN(as_) || hs < 0 || as_ < 0 || hInput.value === '' || aInput.value === '') {
     statusEl.textContent = 'Enter both scores.'; statusEl.className = 'save-err'; return;
   }
-
   const btn = document.querySelector(`#entry-${predId} button`);
   if (btn) { btn.disabled = true; btn.textContent = '…'; }
-
   try {
-    const res = await fetch(`${API}/predictions/result`, { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ prediction_id: predId, home_score: hs, away_score: as_ }) });
+    const res  = await fetch(`${API}/predictions/result`, {
+      method: 'POST', headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({ prediction_id: predId, home_score: hs, away_score: as_ })
+    });
     const data = await res.json();
-    if (!res.ok) { statusEl.textContent = data.detail || 'Error saving.'; statusEl.className = 'save-err'; if (btn) { btn.disabled = false; btn.textContent = 'Save'; } return; }
-
+    if (!res.ok) {
+      statusEl.textContent = data.detail || 'Error saving.'; statusEl.className = 'save-err';
+      if (btn) { btn.disabled = false; btn.textContent = 'Save'; } return;
+    }
     const icon = data.is_correct ? '✓' : '✗';
-    statusEl.textContent = `${icon} ${data.outcome_label}`;
-    statusEl.className = data.is_correct ? 'save-ok' : 'save-err';
-
-    // Remove from session queue
-    _queuedPredictions = _queuedPredictions.filter(p => p.id !== predId);
-    renderQueue();
-
-    // Animate & reload after a brief moment
+    statusEl.textContent = `${icon} ${data.outcome_label}`; statusEl.className = data.is_correct ? 'save-ok' : 'save-err';
+    _queuedPredictions = _queuedPredictions.filter(p => p.id !== predId); renderQueue();
     const row = document.getElementById(`pending-row-${predId}`);
     if (row) { row.style.opacity = '0.5'; row.style.transition = 'opacity 0.4s'; }
     setTimeout(() => loadHistory(), 600);
-  } catch(_) { statusEl.textContent = 'Network error.'; statusEl.className = 'save-err'; if (btn) { btn.disabled = false; btn.textContent = 'Save'; } }
+  } catch(_) {
+    statusEl.textContent = 'Network error.'; statusEl.className = 'save-err';
+    if (btn) { btn.disabled = false; btn.textContent = 'Save'; }
+  }
 }
-
-// ── league table ──────────────────────────────────────────────────────────
 
 function toggleLeague() {
   document.getElementById('league-hdr').classList.toggle('open');
@@ -1126,12 +960,12 @@ function toggleLeague() {
 async function loadTable() {
   try {
     const table = await fetch(`${API}/table`).then(r => r.json());
-    const wrap = document.getElementById('league-table-wrap');
+    const wrap  = document.getElementById('league-table-wrap');
     if (!table.length) { wrap.innerHTML = '<div class="empty">No data yet.</div>'; return; }
     let html = `<table><thead><tr><th>#</th><th>Team</th><th>P</th><th>Pts</th><th>GD</th><th>GF</th><th>GA</th><th>Form</th></tr></thead><tbody>`;
     table.forEach(r => {
       const form = r.form.split('').map(c => {
-        const col = c==='W'?'var(--success)':c==='L'?'var(--danger)':'var(--secondary)';
+        const col = c==='W' ? 'var(--success)' : c==='L' ? 'var(--danger)' : 'var(--secondary)';
         return `<span style="color:${col};font-weight:600">${c}</span>`;
       }).join(' ');
       html += `<tr><td>${r.position}</td><td style="font-weight:500">${esc(r.team)}</td><td>${r.played}</td><td><strong>${r.points}</strong></td><td>${r.gd>=0?'+':''}${r.gd}</td><td>${r.scored}</td><td>${r.conceded}</td><td style="letter-spacing:2px">${form}</td></tr>`;
@@ -1143,34 +977,40 @@ async function loadTable() {
   } catch(_) {}
 }
 
-// ── evaluate ──────────────────────────────────────────────────────────────
+async function runCalibrate() {
+  setLoading('btn-calibrate', true);
+  try {
+    const res  = await fetch(`${API}/calibrate`, { method: 'POST' });
+    const data = await res.json();
+    alert(data.message);
+  } catch(_) { alert('Calibration failed.'); }
+  setLoading('btn-calibrate', false);
+}
 
 async function runEvaluate() {
   setLoading('btn-evaluate', true);
   try {
-    const data = await fetch(`${API}/evaluate`).then(r => r.json());
+    const data    = await fetch(`${API}/evaluate`).then(r => r.json());
     const emptyEl = document.getElementById('eval-empty');
-    const resultsEl = document.getElementById('eval-results');
-    if (!data.n_evaluated) { emptyEl.style.display = 'block'; resultsEl.style.display = 'none'; return; }
-    emptyEl.style.display = 'none'; resultsEl.style.display = 'block';
-
+    const results = document.getElementById('eval-results');
+    if (!data.n_evaluated) { emptyEl.style.display = 'block'; results.style.display = 'none'; return; }
+    emptyEl.style.display = 'none'; results.style.display = 'block';
     document.getElementById('eval-stats').innerHTML = `
       <div class="eval-stat"><div class="val">${data.n_evaluated}</div><div class="lbl">Evaluated predictions</div></div>
       <div class="eval-stat"><div class="val">${data.accuracy}%</div><div class="lbl">Accuracy (secondary)</div></div>
       <div class="eval-stat"><div class="val">${data.avg_log_loss}</div><div class="lbl">Avg log-loss ↓ lower is better</div></div>`;
-
     const calEl = document.getElementById('eval-calibration');
     if (!data.calibration?.length) { calEl.innerHTML = '<div class="empty">No calibration data yet.</div>'; return; }
     let calHtml = '';
     data.calibration.forEach(c => {
       if (c.n === 0) return;
-      const predPct = Math.round(c.predicted_rate * 100);
+      const predPct   = Math.round(c.predicted_rate * 100);
       const actualPct = c.actual_rate !== null ? Math.round(c.actual_rate * 100) : null;
-      const gap = c.gap;
+      const gap       = c.gap;
       let gapHtml = '<span style="color:#B4B2A9">—</span>';
       if (gap !== null) {
         const sign = gap > 0 ? '+' : '';
-        const cls = gap > 0.05 ? 'cal-gap-pos' : gap < -0.05 ? 'cal-gap-neg' : '';
+        const cls  = gap > 0.05 ? 'cal-gap-pos' : gap < -0.05 ? 'cal-gap-neg' : '';
         gapHtml = `<span class="${cls}">${sign}${Math.round(gap*100)}%</span>`;
       }
       calHtml += `<div class="cal-row">
@@ -1188,12 +1028,7 @@ async function runEvaluate() {
   setLoading('btn-evaluate', false);
 }
 
-// ── init ──────────────────────────────────────────────────────────────────
-(async () => {
-  await loadMatches();
-  await refreshTeamList();
-  await refreshPendingCount();
-})();
+(async () => { await loadMatches(); await refreshTeamList(); await refreshPendingCount(); })();
 </script>
 </body>
 </html>
