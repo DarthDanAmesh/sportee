@@ -1,0 +1,115 @@
+{
+  "min_confidence": 0.65,
+  "best_C": 0.3,
+  "C_grid": [
+    {
+      "C": 0.05,
+      "val_accuracy_all": 0.505,
+      "val_log_loss_all": 1.0027,
+      "best_min_confidence": 0.65,
+      "best_gated_accuracy": 0.742,
+      "best_gated_n_bets": 3895,
+      "best_gated_coverage": 0.1272
+    },
+    {
+      "C": 0.1,
+      "val_accuracy_all": 0.5052,
+      "val_log_loss_all": 1.0028,
+      "best_min_confidence": 0.65,
+      "best_gated_accuracy": 0.7421,
+      "best_gated_n_bets": 3897,
+      "best_gated_coverage": 0.1273
+    },
+    {
+      "C": 0.3,
+      "val_accuracy_all": 0.505,
+      "val_log_loss_all": 1.0028,
+      "best_min_confidence": 0.65,
+      "best_gated_accuracy": 0.7431,
+      "best_gated_n_bets": 3897,
+      "best_gated_coverage": 0.1273
+    },
+    {
+      "C": 1.0,
+      "val_accuracy_all": 0.505,
+      "val_log_loss_all": 1.0028,
+      "best_min_confidence": 0.65,
+      "best_gated_accuracy": 0.7422,
+      "best_gated_n_bets": 3895,
+      "best_gated_coverage": 0.1272
+    },
+    {
+      "C": 3.0,
+      "val_accuracy_all": 0.505,
+      "val_log_loss_all": 1.0028,
+      "best_min_confidence": 0.65,
+      "best_gated_accuracy": 0.7427,
+      "best_gated_n_bets": 3895,
+      "best_gated_coverage": 0.1272
+    },
+    {
+      "C": 10.0,
+      "val_accuracy_all": 0.5052,
+      "val_log_loss_all": 1.0028,
+      "best_min_confidence": 0.65,
+      "best_gated_accuracy": 0.7427,
+      "best_gated_n_bets": 3894,
+      "best_gated_coverage": 0.1272
+    },
+    {
+      "C": 30.0,
+      "val_accuracy_all": 0.5052,
+      "val_log_loss_all": 1.0028,
+      "best_min_confidence": 0.65,
+      "best_gated_accuracy": 0.7429,
+      "best_gated_n_bets": 3893,
+      "best_gated_coverage": 0.1271
+    }
+  ],
+  "feature_names": [
+    "home_win_rate",
+    "away_win_rate",
+    "home_attack",
+    "home_defense",
+    "away_attack",
+    "away_defense",
+    "home_form_points",
+    "away_form_points",
+    "prob_h",
+    "prob_d",
+    "prob_a",
+    "market_confidence",
+    "points_difference",
+    "home_ppg",
+    "away_ppg",
+    "home_recent_attack",
+    "home_recent_defense",
+    "away_recent_attack",
+    "away_recent_defense",
+    "attack_diff",
+    "defense_diff",
+    "form_diff",
+    "ppg_diff",
+    "recent_attack_diff",
+    "recent_defense_diff"
+  ],
+  "label_map": {
+    "H": 0,
+    "D": 1,
+    "A": 2
+  },
+  "label_names": [
+    "H",
+    "D",
+    "A"
+  ],
+  "train_cutoff": "2018-07-01",
+  "train_size": 153097,
+  "test_size": 31993,
+  "test_accuracy_all": 0.4989,
+  "test_accuracy_thresh": 0.7316,
+  "test_log_loss": 1.009,
+  "test_n_bets": 4207,
+  "trained_at": "2026-06-24T21:22:51.209694",
+  "n_features": 25
+}
